@@ -17,6 +17,7 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.Toast
+import com.gflix.app.utils.PlaybackErrors
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
@@ -134,6 +135,9 @@ class PlayerMobileFragment : Fragment() {
 
     private var currentVideo: Video? = null
     private var currentServer: Video.Server? = null
+    // TrueHD/DTS lesson (Just Player #547/#703): one retry with audio muted
+    // before abandoning the server.
+    private var retriedMutedAudio = false
     private var isIgnoringPip = false
     private var waitingForBypass = false
     private var bypassDone = false
@@ -913,6 +917,7 @@ class PlayerMobileFragment : Fragment() {
     private fun displayVideo(video: Video, server: Video.Server) {
         currentVideo = video
         currentServer = server
+        retriedMutedAudio = false
         updatePlayerHeader()
 
         val extraBuffering = PlayerSettingsView.Settings.ExtraBuffering.isEnabled
@@ -1133,7 +1138,26 @@ class PlayerMobileFragment : Fragment() {
             override fun onPlayerError(error: PlaybackException) {
                 super.onPlayerError(error)
                 Log.e("PlayerMobileFragment", "onPlayerError: ", error)
-                
+
+                // Unsupported audio (TrueHD/DTS/E-AC-3 on old devices) must not
+                // kill video: retry once with the audio track disabled.
+                if (!retriedMutedAudio && PlaybackErrors.isAudioCodecFailure(error)) {
+                    retriedMutedAudio = true
+                    Log.i("PlayerMobileFragment", "Audio codec failed, retrying video-only")
+                    player.trackSelectionParameters = player.trackSelectionParameters
+                        .buildUpon()
+                        .setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, true)
+                        .build()
+                    player.prepare()
+                    player.play()
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.player_audio_unsupported_video_only),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return
+                }
+
                 val nextServer = servers.getOrNull(servers.indexOf(currentServer) + 1)
                 if (nextServer != null) {
                     Log.i("PlayerMobileFragment", "Playback failed, trying next server: ${nextServer.name}")

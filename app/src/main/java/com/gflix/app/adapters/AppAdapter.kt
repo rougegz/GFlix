@@ -177,8 +177,8 @@ class AppAdapter(
     private var onLoadMoreListener: (() -> Unit)? = null
     private var footer: Footer<ViewBinding>? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-        when (Type.entries[viewType]) {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val holder = when (Type.entries[viewType]) {
             Type.CATEGORY_MOBILE_ITEM -> CategoryViewHolder(
                 ItemCategoryMobileBinding.inflate(
                     LayoutInflater.from(parent.context),
@@ -523,6 +523,12 @@ class AppAdapter(
                 )
             )
         }
+        // Leanback focus polish for every TV card (attach once, never in bind).
+        if (Type.entries[viewType].name.contains("_TV_")) {
+            com.gflix.app.ui.TvFocus.applyScale(holder.itemView)
+        }
+        return holder
+    }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (position >= itemCount - 5 && !isLoading) {

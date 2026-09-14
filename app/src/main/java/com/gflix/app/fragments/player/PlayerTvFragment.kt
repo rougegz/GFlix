@@ -25,6 +25,7 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
+import com.gflix.app.utils.PlaybackErrors
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowInsetsCompat
@@ -153,6 +154,9 @@ class PlayerTvFragment : Fragment() {
 
     private var currentVideo: Video? = null
     private var currentServer: Video.Server? = null
+    // TrueHD/DTS lesson (Just Player #547/#703): one retry with audio muted
+    // before abandoning the server.
+    private var retriedMutedAudio = false
     private var waitingForBypass = false
     private var bypassDone = false
     private var activeBypassSession: BypassSession? = null
@@ -1035,6 +1039,7 @@ class PlayerTvFragment : Fragment() {
         ) {
             currentVideo = video
             currentServer = server
+            retriedMutedAudio = false
             updatePlayerHeader()
             val extraBuffering = PlayerSettingsView.Settings.ExtraBuffering.isEnabled
             val softwareDecoder = PlayerSettingsView.Settings.SoftwareDecoder.isEnabled
@@ -1309,6 +1314,25 @@ class PlayerTvFragment : Fragment() {
                 override fun onPlayerError(error: PlaybackException) {
                     super.onPlayerError(error)
                     Log.e("PlayerTvFragment", "onPlayerError: ", error)
+
+                    // Unsupported audio (TrueHD/DTS/E-AC-3 on old devices) must not
+                    // kill video: retry once with the audio track disabled.
+                    if (!retriedMutedAudio && PlaybackErrors.isAudioCodecFailure(error)) {
+                        retriedMutedAudio = true
+                        Log.i("PlayerTvFragment", "Audio codec failed, retrying video-only")
+                        player.trackSelectionParameters = player.trackSelectionParameters
+                            .buildUpon()
+                            .setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, true)
+                            .build()
+                        player.prepare()
+                        player.play()
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.player_audio_unsupported_video_only),
+                            Toast.LENGTH_LONG
+                        ).show()
+                        return
+                    }
 
                     val nextServer = servers.getOrNull(servers.indexOf(currentServer) + 1)
                     if (nextServer != null) {

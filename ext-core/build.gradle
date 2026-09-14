@@ -3,7 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.serialization' version '2.2.10'
 }
 
-group = "com.streamflixreborn.extcore"
+group = "com.gflix.extcore"
 version = "1.0.0"
 
 repositories {

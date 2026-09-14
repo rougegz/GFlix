@@ -3,8 +3,8 @@
 import pathlib, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-APP_EXT = ROOT / "app" / "src" / "main" / "java" / "com" / "streamflixreborn" / "streamflix" / "extensions"
-FRAG_EXT = ROOT / "app" / "src" / "main" / "java" / "com" / "streamflixreborn" / "streamflix" / "fragments" / "extensions"
+APP_EXT = ROOT / "app" / "src" / "main" / "java" / "com" / "gflix" / "app" / "extensions"
+FRAG_EXT = ROOT / "app" / "src" / "main" / "java" / "com" / "gflix" / "app" / "fragments" / "extensions"
 
 REQUIRED_APP = ["CsRepositoryStore.kt", "DexPluginLoader.kt", "CloudStreamAdapter.kt",
                 "ExtProviderFacade.kt", "ExtLinkResolver.kt", "ExtensionActions.kt"]
@@ -19,8 +19,8 @@ for name in REQUIRED_FRAG:
     if not (FRAG_EXT / name).exists():
         errors.append(f"missing extensions UI file: {name}")
 
-if not (ROOT / "app" / "src" / "main" / "java" / "com" / "streamflixreborn" /
-        "streamflix" / "fragments" / "player" / "PlayerViewModelV2.kt").exists():
+if not (ROOT / "app" / "src" / "main" / "java" / "com" / "gflix" /
+        "app" / "fragments" / "player" / "PlayerViewModelV2.kt").exists():
     errors.append("missing PlayerViewModelV2.kt")
 
 symbols = {
@@ -38,8 +38,8 @@ for path, names in symbols.items():
         if sym not in text:
             errors.append(f"{path.name} missing symbol: {sym}")
 
-prefs = (ROOT / "app" / "src" / "main" / "java" / "com" / "streamflixreborn" /
-        "streamflix" / "utils" / "UserPreferences.kt").read_text()
+prefs = (ROOT / "app" / "src" / "main" / "java" / "com" / "gflix" /
+        "app" / "utils" / "UserPreferences.kt").read_text()
 if "useExtensions" not in prefs:
     errors.append("UserPreferences missing useExtensions flag")
 app_gradle = (ROOT / "app" / "build.gradle").read_text()

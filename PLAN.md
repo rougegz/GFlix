@@ -1,8 +1,8 @@
-# Plan: Streamflix → CloudStream extensions rewrite (in-place)
+# Plan: GFlix → CloudStream extensions rewrite (in-place)
 
 Goal: replace all hardcoded providers/extractors with CloudStream-compatible
 `.cs3` extension runtime + CloudStream-style repo/extension/player UI, same
-package `com.streamflixreborn.streamflix`, mobile + TV.
+package `com.gflix.app`, mobile + TV.
 
 User decisions (2026-09-14): in-place rewrite; Dex `.cs3` loader; mobile+TV
 slice 1; keep TMDB + Supabase + OpenSubtitles/SubDL; ship empty (no default
@@ -43,7 +43,7 @@ Evidence base:
       `kotlin-jvm + kotlinx-serialization-json + junit4` only, no `android.*`
       imports) — verify: `python3 tests/check_ext_core.py` → all files exist +
       no android imports
-- [x] Add contracts `ext-core/src/main/kotlin/com/streamflixreborn/extcore/`:
+- [x] Add contracts `ext-core/src/main/kotlin/com/gflix/extcore/`:
       `CsModels.kt` (CsRepo, CsExtensionMeta mirroring SitePlugin,
       InstalledExtension, ExtLink, ExtSearchItem, ExtLoadData), `RepoManager.kt`
       (normalize/validate/ parse repository.json via injected HttpGet,
@@ -141,7 +141,7 @@ Evidence base:
 
 ## Adjacent security follow-ups (out of scope for this slice, do NOT fix here)
 - `BackupRestoreManager.kt:348` zip-slip on restore (`databases/` prefix escape).
-- `AndroidManifest.xml` deep-link `streamflix://resolve?ws=&token=` SSRF/open-redirect
+- `AndroidManifest.xml` deep-link `gflix://resolve?ws=&token=` SSRF/open-redirect
   (`MainMobileActivity` exported + raw `ws` URL) — enforce `wss://` + allowlist.
 - Global cleartext (`usesCleartextTraffic=true` + `network_security_config.xml`
   base-config) — flip to `false` once repo/dex traffic is proven https-only.

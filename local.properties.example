@@ -1,0 +1,6 @@
+# Copy to local.properties and fill in. All keys are optional for builds;
+# missing keys default to empty strings (CI builds unsigned without secrets).
+APP_LAYOUT=
+TMDB_API_KEY=
+SUBDL_API_KEY=
+RABBITSTREAM_SOURCE_API=

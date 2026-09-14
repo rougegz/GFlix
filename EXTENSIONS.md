@@ -1,6 +1,6 @@
 # Extensions & Repositories
 
-Streamflix plays content through **CloudStream-compatible extensions**. No
+GFlix plays content through **CloudStream-compatible extensions**. No
 sources ship with the app — you add repository URLs, then install extensions.
 
 ## 1. Install a repo

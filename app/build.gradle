@@ -20,24 +20,33 @@ dependencies {
 }
 
 android {
-    namespace 'com.streamflixreborn.streamflix'
+    namespace 'com.gflix.app'
     compileSdk 36
     ndkVersion "26.1.10909125"
 
     def properties = new Properties()
-    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    def localProps = project.rootProject.file('local.properties')
+    if (localProps.exists()) {
+        localProps.newDataInputStream().withCloseable { properties.load(it) }
+    }
+
+    // CI/release without secrets: fall back to empty strings, never crash.
+    def appLayout = properties.getProperty("APP_LAYOUT", "")
+    def tmdbKey = properties.getProperty("TMDB_API_KEY", "")
+    def subdlKey = properties.getProperty("SUBDL_API_KEY", "")
+    def rabbitApi = properties.getProperty("RABBITSTREAM_SOURCE_API", "")
 
     defaultConfig {
-        applicationId "com.streamflixreborn.streamflix"
+        applicationId "com.gflix.app"
         minSdk 21
         targetSdk 35
         versionCode 160
         versionName "1.7.231"
 
-        buildConfigField "String", "APP_LAYOUT", "\"${properties.getProperty("APP_LAYOUT")}\""
-        buildConfigField "String", "TMDB_API_KEY", "\"${properties.getProperty("TMDB_API_KEY")}\""
-        buildConfigField "String", "SUBDL_API_KEY", "\"${properties.getProperty("SUBDL_API_KEY")}\""
-        buildConfigField "String", "RABBITSTREAM_SOURCE_API", "\"${properties.getProperty("RABBITSTREAM_SOURCE_API")}\""
+        buildConfigField "String", "APP_LAYOUT", "\"${appLayout}\""
+        buildConfigField "String", "TMDB_API_KEY", "\"${tmdbKey}\""
+        buildConfigField "String", "SUBDL_API_KEY", "\"${subdlKey}\""
+        buildConfigField "String", "RABBITSTREAM_SOURCE_API", "\"${rabbitApi}\""
 
         if (file("src/main/cpp/native-lib.cpp").exists()) {
             externalNativeBuild {

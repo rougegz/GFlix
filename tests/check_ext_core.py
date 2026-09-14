@@ -3,8 +3,8 @@
 import pathlib, re, sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-EXT = ROOT / "ext-core" / "src" / "main" / "kotlin" / "com" / "streamflixreborn" / "extcore"
-TESTS = ROOT / "ext-core" / "src" / "test" / "kotlin" / "com" / "streamflixreborn" / "extcore"
+EXT = ROOT / "ext-core" / "src" / "main" / "kotlin" / "com" / "gflix" / "extcore"
+TESTS = ROOT / "ext-core" / "src" / "test" / "kotlin" / "com" / "gflix" / "extcore"
 
 REQUIRED = ["CsModels.kt", "RepoManager.kt", "ExtensionInstaller.kt", "ExtApi.kt"]
 REQUIRED_TESTS = ["RepoManagerTest.kt", "InstallerTest.kt"]

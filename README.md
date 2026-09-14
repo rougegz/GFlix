@@ -1,27 +1,27 @@
-<h1 align="center">Streamflix Reborn</h1>
+<h1 align="center">GFlix</h1>
 
 <p align="center">
   <img src="./app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" height="100px" />
   <br />
-  <strong>🔄 Reborn Version</strong> - Community continuation of the original Streamflix project
+  <strong>GFlix</strong> - CloudStream-extension powered streaming interface for Android TV and mobile
   <br />
   An open-source Android TV and mobile app for educational streaming interface, made with Android Studio, in Kotlin
   <br />
-  <a href="https://github.com/streamflix-reborn2/streamflix/releases/latest">
+  <a href="https://github.com/rougegz/GFlix/releases/latest">
     <strong>Download app »</strong>
   </a>
   <br />
   <br />
-  <a href="https://github.com/streamflix-reborn2/streamflix/issues">Report Bug</a>
+  <a href="https://github.com/rougegz/GFlix/issues">Report Bug</a>
   ·
-  <a href="https://github.com/streamflix-reborn2/streamflix/issues">Request Feature</a>
+  <a href="https://github.com/rougegz/GFlix/issues">Request Feature</a>
 </p>
 
 <details>
   <summary>Table of Contents</summary>
 
 - [About the project](#about-the-project)
-  - [What is Streamflix Reborn?](#-what-is-streamflix-reborn2)
+  - [What is GFlix?](#-what-is-gflix)
   - [Features](#features)
   - [Built with](#built-with)
 - [Getting started](#getting-started)
@@ -37,19 +37,19 @@
 ## About the project
 
 <p align="center">
-  <img src="./.github/docs/screenshot.png" alt="Streamflix Preview">
+  <img src="./.github/docs/screenshot.png" alt="GFlix Preview">
 </p>
 
-**Streamflix Reborn** is an independent continuation of the original Streamflix project created by [Lory-Stan TANASI](https://github.com/stantanasi). This reborn version maintains the same educational purpose and functionality while ensuring continued development and support.
+**GFlix** is an open-source Android TV and mobile streaming interface powered by CloudStream-compatible extensions. It is a rename and continuation of the Streamflix Reborn project (originally created by [Lory-Stan TANASI](https://github.com/stantanasi)), maintained by [rougegz](https://github.com/rougegz).
 
-### 🔄 What is Streamflix Reborn?
+### 🔄 What is GFlix?
 
-- **Independent Continuation**: This is an independent continuation of the original Streamflix project
+- **CloudStream extensions**: install repos and extensions instead of hardcoded providers
 - **Same Vision**: Maintains the original educational and open-source philosophy
 - **Enhanced Support**: Continued development and bug fixes by an independent developer
 - **Respectful Fork**: Built with full respect for the original creator's work
 
-Streamflix Reborn is an open-source Android TV and mobile app that provides a user interface for accessing publicly available streaming content from various third-party providers.
+GFlix is an open-source Android TV and mobile app that plays content through user-installed CloudStream extensions. No sources ship with the app — see EXTENSIONS.md.
 
 This app is designed for educational purposes and personal use only. Users are responsible for ensuring they have proper authorization to access any content they view through this application.
 
@@ -89,7 +89,7 @@ Install [Android Studio](https://developer.android.com/studio)
 1. Clone the project to your local machine
 
 ```bash
-git clone https://github.com/streamflix-reborn2/streamflix.git
+git clone https://github.com/rougegz/GFlix.git
 ```
 
 2. Open the project in Android Studio
@@ -114,7 +114,7 @@ Contributions are what make the open source community such an amazing place to l
 
 **IMPORTANT: This application is for educational and personal use only.**
 
-- Streamflix does not host, store, or distribute any copyrighted content
+- GFlix does not host, store, or distribute any copyrighted content
 - All content is sourced from third-party providers and websites
 - Users are solely responsible for ensuring they have legal rights to access any content
 - The developers do not endorse or encourage copyright infringement
@@ -138,7 +138,7 @@ This application is provided "as is" for educational purposes. The developers:
 - **[Lory-Stan TANASI](https://github.com/stantanasi)** - Original Streamflix project creator
 
 ### Reborn Development
-- **Independent Developer** - Streamflix Reborn maintainer
+- **[rougegz](https://github.com/rougegz)** - GFlix maintainer
 - **Special thanks** to the original creator for the excellent foundation
 
 ## License
@@ -151,8 +151,8 @@ This project is licensed under the `Apache-2.0` License - see the [LICENSE](LICE
   © 2022 Lory-Stan TANASI. All rights reserved
 </p>
 
-### Reborn Project
+### GFlix Project
 <p align="center">
   <br />
-  © 2025 Streamflix Reborn. Built with respect for the original work.
+  © 2025 GFlix. Forked from Streamflix Reborn with respect for the original work.
 </p>

@@ -68,7 +68,6 @@ android {
 
     sourceSets {
         main {
-            def appLayout = properties.getProperty("APP_LAYOUT")
             if (appLayout == "mobile") {
                 manifest.srcFile "${project.rootDir}/app/src/main/mobile/AndroidManifest.xml"
             } else if (appLayout == "tv") {

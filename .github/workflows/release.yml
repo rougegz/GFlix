@@ -5,18 +5,23 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write
+
 jobs:
   build-and-release:
     name: Build & Release APK
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
       - name: Setup JDK environment
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v4
         with:
+          distribution: temurin
           java-version: 17
+          cache: gradle
 
       - name: Access Secrets
         env:
@@ -42,12 +47,14 @@ jobs:
           fi
 
       - name: Make Gradle executable
-        run: chmod +x ./gradlew
+        run: |
+          chmod +x ./gradlew
+          mkdir -p /tmp/gflix-apks
 
-      - name: Build APK
+      - name: Build universal APK
         run: ./gradlew assembleRelease --stacktrace
 
-      - name: Sign APK
+      - name: Sign universal APK
         id: sign_apk
         if: ${{ secrets.KEYSTORE != '' }}
         uses: r0adkll/sign-android-release@v1
@@ -57,48 +64,25 @@ jobs:
           alias: ${{ secrets.SIGNING_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.SIGNING_STORE_PASSWORD }}
           keyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
-        env:
-          BUILD_TOOLS_VERSION: "34.0.0"
 
-      - name: Locate APK
-        id: apk
+      - name: Stage universal APK
         run: |
           SIGNED="${{ steps.sign_apk.outputs.signedReleaseFile }}"
           if [ -n "$SIGNED" ] && [ -f "$SIGNED" ]; then
-            echo "path=$SIGNED" >> "$GITHUB_OUTPUT"
+            cp "$SIGNED" /tmp/gflix-apks/GFlix-${{ github.ref_name }}.apk
           else
-            echo "path=$(ls app/build/outputs/apk/release/*.apk | head -n 1)" >> "$GITHUB_OUTPUT"
+            cp "$(ls app/build/outputs/apk/release/*.apk | head -n 1)" /tmp/gflix-apks/GFlix-${{ github.ref_name }}.apk
           fi
-          ls -la app/build/outputs/apk/release/
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-
-      - name: Upload Release APK
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.apk.outputs.path }}
-          asset_name:
-            ${{ github.event.repository.name }}-${{ github.ref_name }}.apk
-          asset_content_type: application/vnd.android.package-archive
+          ls -la /tmp/gflix-apks/
 
       - name: Set Mobile version
         run: |
           echo APP_LAYOUT=mobile >> local.properties
 
-      - name: Build APK
+      - name: Build mobile APK
         run: ./gradlew assembleRelease --stacktrace
 
-      - name: Sign APK
+      - name: Sign mobile APK
         id: sign_apk_mobile
         if: ${{ secrets.KEYSTORE != '' }}
         uses: r0adkll/sign-android-release@v1
@@ -108,39 +92,24 @@ jobs:
           alias: ${{ secrets.SIGNING_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.SIGNING_STORE_PASSWORD }}
           keyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
-        env:
-          BUILD_TOOLS_VERSION: "34.0.0"
 
-      - name: Locate mobile APK
-        id: apk_mobile
+      - name: Stage mobile APK
         run: |
           SIGNED="${{ steps.sign_apk_mobile.outputs.signedReleaseFile }}"
           if [ -n "$SIGNED" ] && [ -f "$SIGNED" ]; then
-            echo "path=$SIGNED" >> "$GITHUB_OUTPUT"
+            cp "$SIGNED" /tmp/gflix-apks/GFlix-${{ github.ref_name }}-only-mobile.apk
           else
-            echo "path=$(ls app/build/outputs/apk/release/*.apk | head -n 1)" >> "$GITHUB_OUTPUT"
+            cp "$(ls app/build/outputs/apk/release/*.apk | head -n 1)" /tmp/gflix-apks/GFlix-${{ github.ref_name }}-only-mobile.apk
           fi
-
-      - name: Upload Release APK
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.apk_mobile.outputs.path }}
-          asset_name:
-            ${{ github.event.repository.name }}-${{ github.ref_name
-            }}-only-mobile.apk
-          asset_content_type: application/vnd.android.package-archive
 
       - name: Set TV version
         run: |
           echo APP_LAYOUT=tv >> local.properties
 
-      - name: Build APK
+      - name: Build TV APK
         run: ./gradlew assembleRelease --stacktrace
 
-      - name: Sign APK
+      - name: Sign TV APK
         id: sign_apk_tv
         if: ${{ secrets.KEYSTORE != '' }}
         uses: r0adkll/sign-android-release@v1
@@ -150,27 +119,19 @@ jobs:
           alias: ${{ secrets.SIGNING_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.SIGNING_STORE_PASSWORD }}
           keyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
-        env:
-          BUILD_TOOLS_VERSION: "34.0.0"
 
-      - name: Locate TV APK
-        id: apk_tv
+      - name: Stage TV APK
         run: |
           SIGNED="${{ steps.sign_apk_tv.outputs.signedReleaseFile }}"
           if [ -n "$SIGNED" ] && [ -f "$SIGNED" ]; then
-            echo "path=$SIGNED" >> "$GITHUB_OUTPUT"
+            cp "$SIGNED" /tmp/gflix-apks/GFlix-${{ github.ref_name }}-only-tv.apk
           else
-            echo "path=$(ls app/build/outputs/apk/release/*.apk | head -n 1)" >> "$GITHUB_OUTPUT"
+            cp "$(ls app/build/outputs/apk/release/*.apk | head -n 1)" /tmp/gflix-apks/GFlix-${{ github.ref_name }}-only-tv.apk
           fi
+          ls -la /tmp/gflix-apks/
 
-      - name: Upload Release APK
-        uses: actions/upload-release-asset@v1.0.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.apk_tv.outputs.path }}
-          asset_name:
-            ${{ github.event.repository.name }}-${{ github.ref_name
-            }}-only-tv.apk
-          asset_content_type: application/vnd.android.package-archive
+          files: /tmp/gflix-apks/*.apk
+          generate_release_notes: true

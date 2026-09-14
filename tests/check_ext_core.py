@@ -6,8 +6,8 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 EXT = ROOT / "ext-core" / "src" / "main" / "kotlin" / "com" / "gflix" / "extcore"
 TESTS = ROOT / "ext-core" / "src" / "test" / "kotlin" / "com" / "gflix" / "extcore"
 
-REQUIRED = ["CsModels.kt", "RepoManager.kt", "ExtensionInstaller.kt", "ExtApi.kt"]
-REQUIRED_TESTS = ["RepoManagerTest.kt", "InstallerTest.kt"]
+REQUIRED = ["CsModels.kt", "RepoManager.kt", "ExtensionInstaller.kt", "ExtApi.kt", "Reflect.kt", "CsPluginApi.kt"]
+REQUIRED_TESTS = ["RepoManagerTest.kt", "InstallerTest.kt", "CsPluginApiTest.kt"]
 
 errors = []
 for name in REQUIRED:
@@ -38,6 +38,8 @@ symbols = {
     "RepoManager.kt": ["normalizeRepoUrl", "parseRepository", "parsePluginList", "class RepoManager"],
     "ExtensionInstaller.kt": ["object ExtensionInstaller", "planInstall", "filesToDelete"],
     "ExtApi.kt": ["interface ExtContentApi", "sortLinksBestFirst", "class FakeExtApi"],
+    "Reflect.kt": ["fun readProp", "fun callSuspend", "fun callSync"],
+    "CsPluginApi.kt": ["class CsPluginApi", "ExtContentApi", "loadLinks", "mainPage"],
 }
 for fname, names in symbols.items():
     text = (EXT / fname).read_text() if (EXT / fname).exists() else ""

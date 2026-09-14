@@ -1,11 +1,15 @@
 package com.gflix.app.extensions
 
+import android.content.Context
 import androidx.room.Dao
+import androidx.room.Database
 import androidx.room.Entity
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.PrimaryKey
 import androidx.room.Query
+import androidx.room.Room
+import androidx.room.RoomDatabase
 import kotlinx.coroutines.flow.Flow
 
 /** Persisted CloudStream repository (user-added URL + cached index). */
@@ -71,4 +75,24 @@ interface ExtDao {
 
     @Query("DELETE FROM ext_installs WHERE repoUrl = :repoUrl")
     suspend fun deleteByRepo(repoUrl: String)
+}
+
+@Database(entities = [RepoEntity::class, ExtEntity::class], version = 1, exportSchema = false)
+abstract class ExtDatabase : RoomDatabase() {
+    abstract fun repoDao(): RepoDao
+    abstract fun extDao(): ExtDao
+
+    companion object {
+        @Volatile
+        private var INSTANCE: ExtDatabase? = null
+
+        fun getInstance(context: Context): ExtDatabase =
+            INSTANCE ?: synchronized(this) {
+                INSTANCE ?: Room.databaseBuilder(
+                    context.applicationContext,
+                    ExtDatabase::class.java,
+                    "ext.db"
+                ).fallbackToDestructiveMigration().build().also { INSTANCE = it }
+            }
+    }
 }

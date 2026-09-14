@@ -22,6 +22,7 @@ import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
+import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
 import androidx.preference.PreferenceScreen
@@ -452,6 +453,11 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
             
             isSelectable = false
             setOnPreferenceClickListener(null)
+        }
+
+        findPreference<Preference>("p_settings_extensions")?.setOnPreferenceClickListener {
+            findNavController().navigate(com.gflix.app.R.id.ext_repos)
+            true
         }
 
         findPreference<Preference>("p_settings_help")?.setOnPreferenceClickListener {

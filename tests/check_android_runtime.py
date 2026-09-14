@@ -41,8 +41,15 @@ for path, names in symbols.items():
 
 prefs = (ROOT / "app" / "src" / "main" / "java" / "com" / "gflix" /
         "app" / "utils" / "UserPreferences.kt").read_text()
-if "useExtensions" not in prefs:
-    errors.append("UserPreferences missing useExtensions flag")
+for sym in ["useExtensions", "currentExtensionId"]:
+    if sym not in prefs:
+        errors.append(f"UserPreferences missing {sym} flag")
+for nav in ["app/src/main/res/navigation/nav_main_graph_mobile.xml",
+            "app/src/main/res/navigation/nav_main_graph_tv.xml"]:
+    text = (ROOT / nav).read_text()
+    for dest in ["ext_repos", "ext_browser"]:
+        if dest not in text:
+            errors.append(f"{nav} missing destination: {dest}")
 app_gradle = (ROOT / "app" / "build.gradle").read_text()
 if "project(':ext-core')" not in app_gradle and 'project(path' not in app_gradle:
     errors.append("app/build.gradle missing :ext-core dependency")

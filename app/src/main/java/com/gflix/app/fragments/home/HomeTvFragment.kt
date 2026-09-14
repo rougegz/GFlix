@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.gflix.app.utils.LoggingUtils
+import androidx.navigation.fragment.findNavController
 import com.gflix.app.utils.UserPreferences
 import com.gflix.app.utils.ProviderChangeNotifier
 
@@ -183,7 +184,22 @@ class HomeTvFragment : Fragment() {
             setItemSpacing(resources.getDimension(R.dimen.home_spacing).toInt() * 2)
         }
 
+        refreshExtSelector()
+        binding.btnExtSelector.setOnClickListener {
+            findNavController().navigate(R.id.ext_browser)
+        }
+
         binding.root.requestFocus()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (_binding != null) refreshExtSelector()
+    }
+
+    private fun refreshExtSelector() {
+        val id = UserPreferences.currentExtensionId
+        binding.btnExtSelector.text = id.ifBlank { getString(R.string.ext_selector_none) }
     }
 
     private fun displayHome(categories: List<Category>) {

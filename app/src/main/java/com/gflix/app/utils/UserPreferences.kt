@@ -513,6 +513,11 @@ object UserPreferences {
         get() = Key.USE_EXTENSIONS.getBoolean() ?: false
         set(value) = Key.USE_EXTENSIONS.setBoolean(value)
 
+    // Currently selected extension (internalName); shown on home on launch.
+    var currentExtensionId: String
+        get() = Key.CURRENT_EXTENSION_ID.getString() ?: ""
+        set(value) = Key.CURRENT_EXTENSION_ID.setString(value)
+
     fun getFavoriteCategoryOrder(providerName: String): List<String> {
         val key = "FAVORITE_CATEGORY_ORDER_$providerName"
         val saved = prefs.getString(key, null)
@@ -598,7 +603,8 @@ object UserPreferences {
         UPDATE_CHECK_ENABLED,
         PROVIDER_LANGUAGE,
         FAVORITE_PROVIDERS,
-        USE_EXTENSIONS;
+        USE_EXTENSIONS,
+        CURRENT_EXTENSION_ID;
 
         fun getStringSet(): Set<String>? = when {
             prefs.contains(name) -> prefs.getStringSet(name, null)

@@ -39,7 +39,7 @@ open class ReposMobileFragment : Fragment() {
             orientation = LinearLayout.VERTICAL
             setPadding(48, 48, 48, 48)
         }
-        urlInput = EditText(ctx).apply { hint = "https://…/repository.json" }
+        urlInput = EditText(ctx).apply { hint = "URL or shortcode (e.g. rougegz)" }
         val addBtn = Button(ctx).apply { text = "Install repo" }
         statusView = TextView(ctx)
         addBtn.setOnClickListener {

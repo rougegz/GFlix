@@ -12,9 +12,27 @@ interface HttpGet {
 
 private val lenientJson = Json { ignoreUnknownKeys = true; isLenient = true }
 
+private val SHORTCUT_PART = Regex("^[A-Za-z0-9](?:[A-Za-z0-9._-]{0,38}[A-Za-z0-9])?$")
+
+fun expandRepoShortcut(raw: String): String {
+    val input = raw.trim()
+    if (input.isEmpty() || input.contains("://") || input.contains(".") || input.contains("/")) {
+        if (input.contains("/") && !input.contains(".") && !input.contains("://")) {
+            val parts = input.split("/")
+            if (parts.size == 2 && parts.all { SHORTCUT_PART.matches(it) }) {
+                return "https://raw.githubusercontent.com/${parts[0]}/${parts[1]}/builds/repo.json"
+            }
+        }
+        return input
+    }
+    require(SHORTCUT_PART.matches(input)) { "Invalid repository shortcut: $input" }
+    return "https://raw.githubusercontent.com/$input/cs-repo/builds/repo.json"
+}
+
 /** Normalize a user-pasted repo URL. Throws IllegalArgumentException when unusable. */
 fun normalizeRepoUrl(raw: String): String {
-    val trimmed = raw.trim()
+    val expanded = expandRepoShortcut(raw.trim())
+    val trimmed = expanded.trim()
     require(trimmed.isNotEmpty()) { "Repository URL must not be empty" }
     require(!trimmed.contains(" ")) { "Repository URL must not contain spaces" }
     val withScheme = if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {

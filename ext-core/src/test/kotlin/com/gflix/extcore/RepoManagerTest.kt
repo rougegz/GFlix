@@ -62,6 +62,23 @@ class RepoManagerTest {
         manager().addRepo("   ")
     }
 
+    @Test fun `shortcode expands to cs-repo url`() {
+        assertEquals(
+            "https://raw.githubusercontent.com/rougegz/cs-repo/builds/repo.json",
+            expandRepoShortcut("rougegz")
+        )
+        assertEquals(
+            "https://raw.githubusercontent.com/rougegz/cs-repo/builds/repo.json",
+            expandRepoShortcut("  rougegz  ")
+        )
+        assertEquals(
+            "https://raw.githubusercontent.com/foo/bar/builds/repo.json",
+            expandRepoShortcut("foo/bar")
+        )
+        assertEquals("https://example.com/r.json", expandRepoShortcut("https://example.com/r.json"))
+        assertEquals("example.com/r.json", expandRepoShortcut("example.com/r.json"))
+    }
+
     @Test fun `blocked hosts rejected`() {
         assertTrue(isBlockedHost(hostOf("https://169.254.169.254/x.json")))
         assertTrue(isBlockedHost(hostOf("https://10.0.0.1/x.json")))

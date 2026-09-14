@@ -29,6 +29,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.Group
+import androidx.navigation.fragment.findNavController
 import androidx.leanback.preference.LeanbackPreferenceFragmentCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.EditTextPreference
@@ -487,6 +488,11 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
 
             isSelectable = false
             setOnPreferenceClickListener(null)
+        }
+
+        findPreference<Preference>("p_settings_extensions")?.setOnPreferenceClickListener {
+            findNavController().navigate(com.gflix.app.R.id.ext_repos)
+            true
         }
 
         findPreference<Preference>("p_settings_help")?.setOnPreferenceClickListener {

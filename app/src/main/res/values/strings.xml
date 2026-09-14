@@ -237,6 +237,9 @@
     <string name="player_settings_subdl_label">SubDL</string>
     <string name="player_settings_local_subtitles_label">Load from files</string>
     <string name="player_settings_speed_title">Video speed</string>
+    <string name="ext_selector_none">Select extension</string>
+    <string name="ext_settings_title">Extensions and repositories</string>
+    <string name="ext_settings_summary">Add repos, install and manage CloudStream extensions</string>
     <string name="player_audio_unsupported_video_only">Audio format not supported — playing video only</string>
     <string name="player_settings_speed_label">Speed</string>
     <string name="player_settings_speed_0_25">× 0.25</string>

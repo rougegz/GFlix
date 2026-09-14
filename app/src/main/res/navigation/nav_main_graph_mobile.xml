@@ -15,6 +15,16 @@
             app:destination="@id/home" />
     </fragment>
 
+
+    <fragment
+        android:id="@+id/ext_repos"
+        android:name="com.gflix.app.fragments.extensions.ReposMobileFragment"
+        android:label="fragment_repos_mobile" />
+    <fragment
+        android:id="@+id/ext_browser"
+        android:name="com.gflix.app.fragments.extensions.ExtBrowserMobileFragment"
+        android:label="fragment_extensions_mobile" />
+
     <!-- Global Actions -->
     <action
         android:id="@+id/action_global_providers"

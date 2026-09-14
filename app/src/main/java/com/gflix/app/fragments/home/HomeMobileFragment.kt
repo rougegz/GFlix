@@ -144,7 +144,7 @@ class HomeMobileFragment : Fragment() {
                 .into(this)
 
             setOnClickListener {
-                findNavController().navigate(R.id.providers)
+                findNavController().navigate(R.id.ext_browser)
             }
         }
         

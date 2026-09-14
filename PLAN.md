@@ -147,7 +147,13 @@ Evidence base:
   base-config) — flip to `false` once repo/dex traffic is proven https-only.
 - `allowBackup=true` exfiltrates `files/Extensions/*.cs3` + DBs — exclude or disable.
 
-## Reference-repo feature backlog (mined 2026-09-14, SHIPPED: remember-speed v1.0.9)
+## Reference-repo feature backlog (mined 2026-09-14)
+SHIPPED v1.0.9: remember-speed. SHIPPED v1.1.0 (Slice A): smart default
+audio/subtitle language + max resolution (TrackLanguage, CloudStream/Zangetsu
+pattern). SHIPPED v1.1.1 (Slice B/C/D): TvFocus scale for all TV cards,
+video-only retry on audio codec failure (Just Player lesson), GFlix locale names.
+Research fleet (12 agents): mpv/mpvRx, VLC, Nova/Just Player, Kodi, Stremio,
+CloudStream UI, SkyStream, sozo-tv, Zangetsu, Lumera, ARVIO, Jellyfin/Findroid.
 Ranked portable ideas from NuvioMobile-Enhanced / Sozo / Sozo-tv / Zangetsu / CloudStream releases:
 1. DONE — Remember-My-Choices speed carry-over (Nuvio 0.4.13).
 2. TODO — Finish-time overlay + hold-to-speed guard (Nuvio 0.3.1, Zangetsu v2.1.0).

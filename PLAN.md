@@ -181,3 +181,11 @@ Slices: A smart defaults (audio/sub/resolution + label matching e.g. Telugu),
 B D-pad, C player settings, D dead-code/weight, then review + signed release.
 Constraints: additive + small diffs, CI must stay green, no device here —
 D-pad claims verified by code inspection + lint, noted as needs-device-test.
+
+## Release v1.3.0-cloudstream (2026-09-14)
+- Branch: main only (feature branch merged + deleted).
+- Tag `v1.3.0-cloudstream` → `.github/workflows/release.yml` built 3 APKs
+  (universal / mobile / TV) and published GitHub Release with generated notes.
+- Signed with ephemeral debug key (no KEYSTORE secrets set). To ship
+  release-signed APKs, add secrets: KEYSTORE (base64), SIGNING_KEY_ALIAS,
+  SIGNING_STORE_PASSWORD, SIGNING_KEY_PASSWORD, then push a new `v*` tag.

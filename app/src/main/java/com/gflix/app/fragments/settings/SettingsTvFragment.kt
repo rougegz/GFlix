@@ -544,6 +544,30 @@ class SettingsTvFragment : LeanbackPreferenceFragmentCompat() {
             }
         }
 
+        findPreference<EditTextPreference>("PREFERRED_AUDIO_LANGUAGE")?.apply {
+            text = UserPreferences.preferredAudioLanguage
+            setOnPreferenceChangeListener { _, newValue ->
+                UserPreferences.preferredAudioLanguage = (newValue as? String).orEmpty()
+                true
+            }
+        }
+
+        findPreference<EditTextPreference>("PREFERRED_SUBTITLE_LANGUAGE")?.apply {
+            text = UserPreferences.preferredSubtitleLanguage
+            setOnPreferenceChangeListener { _, newValue ->
+                UserPreferences.preferredSubtitleLanguage = (newValue as? String).orEmpty()
+                true
+            }
+        }
+
+        findPreference<ListPreference>("PREFERRED_MAX_HEIGHT")?.apply {
+            value = UserPreferences.preferredMaxHeight.toString()
+            setOnPreferenceChangeListener { _, newValue ->
+                UserPreferences.preferredMaxHeight = (newValue as? String)?.toIntOrNull() ?: 0
+                true
+            }
+        }
+
         findPreference<SwitchPreference>("UPDATE_CHECK_ENABLED")?.apply {
             isChecked = UserPreferences.updateCheckEnabled
             setOnPreferenceChangeListener { _, newValue ->

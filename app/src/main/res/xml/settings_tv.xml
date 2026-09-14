@@ -124,6 +124,31 @@
                 android:summary="@string/settings_server_voe_summary"
                 android:defaultValue="true" />
         </PreferenceCategory>
+
+        <PreferenceCategory
+            android:title="@string/settings_default_tracks_title"
+            android:summary="@string/settings_default_tracks_summary">
+
+            <EditTextPreference
+                android:key="PREFERRED_AUDIO_LANGUAGE"
+                android:title="@string/settings_preferred_audio_title"
+                android:summary="@string/settings_preferred_audio_summary"
+                android:defaultValue="" />
+
+            <EditTextPreference
+                android:key="PREFERRED_SUBTITLE_LANGUAGE"
+                android:title="@string/settings_preferred_subtitle_title"
+                android:summary="@string/settings_preferred_subtitle_summary"
+                android:defaultValue="" />
+
+            <ListPreference
+                android:key="PREFERRED_MAX_HEIGHT"
+                android:title="@string/settings_max_resolution_title"
+                android:summary="@string/settings_max_resolution_summary"
+                android:entries="@array/max_resolution_names"
+                android:entryValues="@array/max_resolution_values"
+                android:defaultValue="0" />
+        </PreferenceCategory>
     </PreferenceScreen>
 
     <PreferenceScreen

@@ -595,6 +595,29 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                                 )
                                 .setForceHighestSupportedBitrate(false)
                                 .build()
+                        } ?: run {
+                            // Preferred max resolution: cap height when no exact
+                            // remembered quality matches (0 = unlimited).
+                            val maxHeight = UserPreferences.preferredMaxHeight
+                            if (maxHeight > 0) {
+                                list.filterIsInstance<VideoTrackInformation>()
+                                    .filter { it.height in 1..maxHeight }
+                                    .maxByOrNull { it.height }
+                                    ?.let {
+                                        player.trackSelectionParameters =
+                                            player.trackSelectionParameters
+                                                .buildUpon()
+                                                .clearOverridesOfType(C.TRACK_TYPE_VIDEO)
+                                                .setOverrideForType(
+                                                    TrackSelectionOverride(
+                                                        it.trackGroup.mediaTrackGroup,
+                                                        listOf(it.trackIndex)
+                                                    )
+                                                )
+                                                .setForceHighestSupportedBitrate(false)
+                                                .build()
+                                    }
+                            }
                         }
                 }
             }
@@ -674,6 +697,7 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
 
                                         AudioTrackInformation(
                                             name = finalName,
+                                            language = trackFormat.language,
 
                                             trackGroup = trackGroup,
                                             trackIndex = trackIndex,
@@ -682,6 +706,27 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                             }
                             .sortedBy { it.name }
                     )
+
+                    // Smart default: prefer the user's audio language (e.g. Telugu).
+                    val preferredAudio = UserPreferences.preferredAudioLanguage
+                    if (preferredAudio.isNotBlank()) {
+                        list.find {
+                            com.gflix.app.utils.TrackLanguage.matches(
+                                it.name, it.language, preferredAudio
+                            )
+                        }?.let { match ->
+                            player.trackSelectionParameters = player.trackSelectionParameters
+                                .buildUpon()
+                                .setOverrideForType(
+                                    TrackSelectionOverride(
+                                        match.trackGroup.mediaTrackGroup,
+                                        listOf(match.trackIndex)
+                                    )
+                                )
+                                .setTrackTypeDisabled(match.trackGroup.type, false)
+                                .build()
+                        }
+                    }
                 }
             }
 
@@ -689,6 +734,7 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
 
             class AudioTrackInformation(
                 val name: String,
+                val language: String? = null,
 
                 val trackGroup: Tracks.Group,
                 val trackIndex: Int,
@@ -742,6 +788,31 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                     // Add SubDL only if an API key is configured
                     if (UserPreferences.subdlApiKey.isNotEmpty()) {
                         list.add(SubDLSubtitles)
+                    }
+
+                    // Smart default: prefer the user's subtitle language (e.g. Telugu).
+                    // Explicit user choice: applies even when server auto-subs are off.
+                    val preferredSub = UserPreferences.preferredSubtitleLanguage
+                    if (preferredSub.isNotBlank()) {
+                        list.filterIsInstance<TextTrackInformation>()
+                            .find {
+                                com.gflix.app.utils.TrackLanguage.matches(
+                                    it.label.ifBlank { it.name }, it.language, preferredSub
+                                )
+                            }?.let { match ->
+                                player.trackSelectionParameters = player.trackSelectionParameters
+                                    .buildUpon()
+                                    .setOverrideForType(
+                                        TrackSelectionOverride(
+                                            match.trackGroup.mediaTrackGroup,
+                                            listOf(match.trackIndex)
+                                        )
+                                    )
+                                    .setTrackTypeDisabled(match.trackGroup.type, false)
+                                    .build()
+                                UserPreferences.subtitleName =
+                                    (match.language ?: match.label).substringBefore(" ")
+                            }
                     }
                 }
             }

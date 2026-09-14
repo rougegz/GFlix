@@ -77,4 +77,20 @@
         <item>LAT</item>
         <item>SUB</item>
     </string-array>
+
+    <string-array name="max_resolution_names">
+        <item>@string/settings_max_resolution_unlimited</item>
+        <item>480p</item>
+        <item>720p</item>
+        <item>1080p</item>
+        <item>4K (2160p)</item>
+    </string-array>
+
+    <string-array name="max_resolution_values">
+        <item>0</item>
+        <item>480</item>
+        <item>720</item>
+        <item>1080</item>
+        <item>2160</item>
+    </string-array>
 </resources>

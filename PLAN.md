@@ -159,3 +159,13 @@ Ranked portable ideas from NuvioMobile-Enhanced / Sozo / Sozo-tv / Zangetsu / Cl
 8. TODO — Sleep timer (Zangetsu v1.9.3).
 9. TODO — App Lock PIN/biometric (Sozo v2.0).
 10. TODO — Catalogue-first resolve + source priority sweep (Zangetsu v2.0.0) — core rewrite step.
+
+## UI Overhaul Program (launched 2026-09-14)
+Goal: best lightweight GFlix UI + player + settings, D-pad safe, old+new devices.
+Research fleet (12 subagents): mpv-android/mpvRx, VLC, Nova/Just Player,
+Kodi 10-foot UI, Stremio catalog, CloudStream UI, SkyStream, sozo-tv, Zangetsu,
+Lumera, ARVIO, Jellyfin/Findroid TV UX.
+Slices: A smart defaults (audio/sub/resolution + label matching e.g. Telugu),
+B D-pad, C player settings, D dead-code/weight, then review + signed release.
+Constraints: additive + small diffs, CI must stay green, no device here —
+D-pad claims verified by code inspection + lint, noted as needs-device-test.

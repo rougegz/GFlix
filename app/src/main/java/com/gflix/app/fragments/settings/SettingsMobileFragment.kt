@@ -532,6 +532,30 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
             }
         }
 
+        findPreference<EditTextPreference>("PREFERRED_AUDIO_LANGUAGE")?.apply {
+            text = UserPreferences.preferredAudioLanguage
+            setOnPreferenceChangeListener { _, newValue ->
+                UserPreferences.preferredAudioLanguage = (newValue as? String).orEmpty()
+                true
+            }
+        }
+
+        findPreference<EditTextPreference>("PREFERRED_SUBTITLE_LANGUAGE")?.apply {
+            text = UserPreferences.preferredSubtitleLanguage
+            setOnPreferenceChangeListener { _, newValue ->
+                UserPreferences.preferredSubtitleLanguage = (newValue as? String).orEmpty()
+                true
+            }
+        }
+
+        findPreference<ListPreference>("PREFERRED_MAX_HEIGHT")?.apply {
+            value = UserPreferences.preferredMaxHeight.toString()
+            setOnPreferenceChangeListener { _, newValue ->
+                UserPreferences.preferredMaxHeight = (newValue as? String)?.toIntOrNull() ?: 0
+                true
+            }
+        }
+
         val HasConfigProvider = UserPreferences.currentProvider is ProviderConfigUrl
         findPreference<PreferenceCategory>("pc_provider_settings")?.apply {
             isVisible = HasConfigProvider

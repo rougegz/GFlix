@@ -27,6 +27,7 @@ symbols = {
     APP_EXT / "DexPluginLoader.kt": ["PathClassLoader", "manifest.json", "pluginClassName"],
     APP_EXT / "ExtProviderFacade.kt": [": Provider", "class ExtProviderFacade", "getServers", "getVideo"],
     APP_EXT / "CloudStreamAdapter.kt": ["toServer", "toVideo", "toVideoOrNull", "sortBestFirst"],
+    ROOT / "app" / "src" / "main" / "java" / "com" / "gflix" / "app" / "utils" / "TrackLanguage.kt": ["object TrackLanguage", "fun matches", "fun canonical"],
     APP_EXT / "ExtLinkResolver.kt": ["requestHeaders", "dataSourceFactory", "PER_API_TIMEOUT_MS" if False else "dataSourceFactory"],
     APP_EXT / "ExtProviderFacade.kt": ["PER_API_TIMEOUT_MS", "toVideoOrNull", "supervisorScope"],
     APP_EXT / "ExtensionActions.kt": ["sha256", "Extensions/", "fun install", "fun delete"],

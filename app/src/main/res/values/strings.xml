@@ -452,6 +452,15 @@
  
     <string name="settings_server_voe_category">VOE server settings</string>
     <string name="settings_server_voe_title">Disable server auto subtitles</string>
+    <string name="settings_default_tracks_title">Default audio and subtitles</string>
+    <string name="settings_default_tracks_summary">Preferred languages and maximum resolution, applied automatically</string>
+    <string name="settings_preferred_audio_title">Default audio language</string>
+    <string name="settings_preferred_audio_summary">Language name or code, e.g. Telugu or te. Blank means automatic.</string>
+    <string name="settings_preferred_subtitle_title">Default subtitle language</string>
+    <string name="settings_preferred_subtitle_summary">Language name or code, e.g. English or en. Blank means automatic.</string>
+    <string name="settings_max_resolution_title">Preferred maximum resolution</string>
+    <string name="settings_max_resolution_summary">Videos above this height are capped when possible</string>
+    <string name="settings_max_resolution_unlimited">Unlimited</string>
     <string name="settings_server_voe_summary">If enabled, subtitles from VOE, Vidnest and Vidzy servers will not be active by default even if they are available and have a default true value</string>
     <string name="settings_category_animeonlineninja">Anime Online Ninja settings</string>
     <string name="settings_provider_animeonlineninja_preferred_server">Preferred server</string>

@@ -171,6 +171,21 @@ object UserPreferences {
             Key.PLAYBACK_SPEED.setFloat(value)
         }
 
+    // Smart track defaults: matched against track labels/codes (e.g. "Telugu").
+    // Blank = Auto (leave ExoPlayer default selection).
+    var preferredAudioLanguage: String
+        get() = Key.PREFERRED_AUDIO_LANGUAGE.getString() ?: ""
+        set(value) = Key.PREFERRED_AUDIO_LANGUAGE.setString(value)
+
+    var preferredSubtitleLanguage: String
+        get() = Key.PREFERRED_SUBTITLE_LANGUAGE.getString() ?: ""
+        set(value) = Key.PREFERRED_SUBTITLE_LANGUAGE.setString(value)
+
+    // Preferred max resolution height (0 = unlimited).
+    var preferredMaxHeight: Int
+        get() = Key.PREFERRED_MAX_HEIGHT.getInt() ?: 0
+        set(value) = Key.PREFERRED_MAX_HEIGHT.setInt(value)
+
     var selectedTheme: String
         get() = Key.SELECTED_THEME.getString() ?: "default"
         set(value) = Key.SELECTED_THEME.setString(value)
@@ -568,6 +583,9 @@ object UserPreferences {
         AUTOPLAY_BUFFER,
         SERVER_AUTO_SUBTITLES_DISABLED,
         PLAYBACK_SPEED,
+        PREFERRED_AUDIO_LANGUAGE,
+        PREFERRED_SUBTITLE_LANGUAGE,
+        PREFERRED_MAX_HEIGHT,
         ENABLE_TMDB,
         PARENTAL_CONTROL_PIN,
         PARENTAL_CONTROL_ADMIN_PIN,

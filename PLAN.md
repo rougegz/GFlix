@@ -146,3 +146,16 @@ Evidence base:
 - Global cleartext (`usesCleartextTraffic=true` + `network_security_config.xml`
   base-config) — flip to `false` once repo/dex traffic is proven https-only.
 - `allowBackup=true` exfiltrates `files/Extensions/*.cs3` + DBs — exclude or disable.
+
+## Reference-repo feature backlog (mined 2026-09-14, SHIPPED: remember-speed v1.0.9)
+Ranked portable ideas from NuvioMobile-Enhanced / Sozo / Sozo-tv / Zangetsu / CloudStream releases:
+1. DONE — Remember-My-Choices speed carry-over (Nuvio 0.4.13).
+2. TODO — Finish-time overlay + hold-to-speed guard (Nuvio 0.3.1, Zangetsu v2.1.0).
+3. TODO — Subtitle language grouping + custom font (Nuvio 0.3.1, CloudStream v4.5.2).
+4. TODO — Auto-skip OP/ED + intro-skip DB (Zangetsu v1.9.3, CloudStream v4.8.0).
+5. TODO — Report-broken-link from title (Sozo v2.0) — fits .cs3 model perfectly.
+6. TODO — In-app updater already exists; add Beta channel opt-in (Zangetsu v1.9.1).
+7. TODO — One-tap sanitized log share (Zangetsu v2.1.0) for extension bug reports.
+8. TODO — Sleep timer (Zangetsu v1.9.3).
+9. TODO — App Lock PIN/biometric (Sozo v2.0).
+10. TODO — Catalogue-first resolve + source priority sweep (Zangetsu v2.0.0) — core rewrite step.

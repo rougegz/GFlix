@@ -1,4 +1,4 @@
-package com.streamflixreborn.streamflix.utils;
+package com.gflix.app.utils;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;

@@ -1,4 +1,4 @@
-name: Build & Release APK
+name: GFlix Release
 
 on:
   push:
@@ -9,128 +9,48 @@ permissions:
   contents: write
 
 jobs:
-  build-and-release:
-    name: Build & Release APK
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup JDK environment
+      - name: Setup JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: "17"
           cache: gradle
 
-      - name: Access Secrets
-        env:
-          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
-          RABBITSTREAM_SOURCE_API: ${{ secrets.RABBITSTREAM_SOURCE_API }}
+      - name: Write local properties
         run: |
-          echo TMDB_API_KEY=$TMDB_API_KEY >> local.properties
-          echo RABBITSTREAM_SOURCE_API=$RABBITSTREAM_SOURCE_API >> local.properties
-
-      - name: Generate native-lib.cpp from template
-        env:
-          UPROT_API_BASE: ${{ secrets.UPROT_API_BASE }}
-          UPROT_SIGN_KEY: ${{ secrets.UPROT_SIGN_KEY }}
-          UPROT_DIRECT_API_BASE: ${{ secrets.UPROT_DIRECT_API_BASE }}
-          UPROT_DIRECT_KEY: ${{ secrets.UPROT_DIRECT_KEY }}
-        run: |
-          if [ -n "$UPROT_DIRECT_KEY" ] || [ -n "$UPROT_API_BASE" ]; then
-            sed -e "s|{{UPROT_API_BASE}}|$UPROT_API_BASE|g" \
-                -e "s|{{UPROT_SIGN_KEY}}|$UPROT_SIGN_KEY|g" \
-                -e "s|{{UPROT_DIRECT_API_BASE}}|$UPROT_DIRECT_API_BASE|g" \
-                -e "s|{{UPROT_DIRECT_KEY}}|$UPROT_DIRECT_KEY|g" \
-                app/src/main/cpp/native-lib.cpp.template > app/src/main/cpp/native-lib.cpp
-          fi
-
-      - name: Make Gradle executable
-        run: |
+          touch local.properties
+          echo "TMDB_API_KEY=${{ secrets.TMDB_API_KEY }}" >> local.properties
+          echo "RABBITSTREAM_SOURCE_API=${{ secrets.RABBITSTREAM_SOURCE_API }}" >> local.properties
           chmod +x ./gradlew
           mkdir -p /tmp/gflix-apks
 
       - name: Build universal APK
         run: ./gradlew assembleRelease --stacktrace
 
-      - name: Sign universal APK
-        id: sign_apk
-        if: ${{ secrets.KEYSTORE != '' }}
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.KEYSTORE }}
-          alias: ${{ secrets.SIGNING_KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.SIGNING_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
-
       - name: Stage universal APK
         run: |
-          SIGNED="${{ steps.sign_apk.outputs.signedReleaseFile }}"
-          if [ -n "$SIGNED" ] && [ -f "$SIGNED" ]; then
-            cp "$SIGNED" /tmp/gflix-apks/GFlix-${{ github.ref_name }}.apk
-          else
-            cp "$(ls app/build/outputs/apk/release/*.apk | head -n 1)" /tmp/gflix-apks/GFlix-${{ github.ref_name }}.apk
-          fi
-          ls -la /tmp/gflix-apks/
-
-      - name: Set Mobile version
-        run: |
-          echo APP_LAYOUT=mobile >> local.properties
+          cp "$(ls app/build/outputs/apk/release/*.apk | head -n 1)" "/tmp/gflix-apks/GFlix-${{ github.ref_name }}.apk"
 
       - name: Build mobile APK
-        run: ./gradlew assembleRelease --stacktrace
-
-      - name: Sign mobile APK
-        id: sign_apk_mobile
-        if: ${{ secrets.KEYSTORE != '' }}
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.KEYSTORE }}
-          alias: ${{ secrets.SIGNING_KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.SIGNING_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
-
-      - name: Stage mobile APK
         run: |
-          SIGNED="${{ steps.sign_apk_mobile.outputs.signedReleaseFile }}"
-          if [ -n "$SIGNED" ] && [ -f "$SIGNED" ]; then
-            cp "$SIGNED" /tmp/gflix-apks/GFlix-${{ github.ref_name }}-only-mobile.apk
-          else
-            cp "$(ls app/build/outputs/apk/release/*.apk | head -n 1)" /tmp/gflix-apks/GFlix-${{ github.ref_name }}-only-mobile.apk
-          fi
-
-      - name: Set TV version
-        run: |
-          echo APP_LAYOUT=tv >> local.properties
+          echo "APP_LAYOUT=mobile" >> local.properties
+          ./gradlew assembleRelease --stacktrace
+          cp "$(ls app/build/outputs/apk/release/*.apk | head -n 1)" "/tmp/gflix-apks/GFlix-${{ github.ref_name }}-only-mobile.apk"
 
       - name: Build TV APK
-        run: ./gradlew assembleRelease --stacktrace
-
-      - name: Sign TV APK
-        id: sign_apk_tv
-        if: ${{ secrets.KEYSTORE != '' }}
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.KEYSTORE }}
-          alias: ${{ secrets.SIGNING_KEY_ALIAS }}
-          keyStorePassword: ${{ secrets.SIGNING_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
-
-      - name: Stage TV APK
         run: |
-          SIGNED="${{ steps.sign_apk_tv.outputs.signedReleaseFile }}"
-          if [ -n "$SIGNED" ] && [ -f "$SIGNED" ]; then
-            cp "$SIGNED" /tmp/gflix-apks/GFlix-${{ github.ref_name }}-only-tv.apk
-          else
-            cp "$(ls app/build/outputs/apk/release/*.apk | head -n 1)" /tmp/gflix-apks/GFlix-${{ github.ref_name }}-only-tv.apk
-          fi
+          echo "APP_LAYOUT=tv" >> local.properties
+          ./gradlew assembleRelease --stacktrace
+          cp "$(ls app/build/outputs/apk/release/*.apk | head -n 1)" "/tmp/gflix-apks/GFlix-${{ github.ref_name }}-only-tv.apk"
           ls -la /tmp/gflix-apks/
 
-      - name: Publish GitHub Release
+      - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
           files: /tmp/gflix-apks/*.apk

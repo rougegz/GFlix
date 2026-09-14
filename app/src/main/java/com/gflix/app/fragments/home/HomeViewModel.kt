@@ -422,7 +422,7 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
             Log.e("HomeViewModel", "getHome: ", e)
             if (cachedCategories.isNullOrEmpty()) {
                 _state.emit(State.FailedLoading(e))
-            } else if (deferCachedHomeForClearance) {
+            } else {
                 _state.emit(State.SuccessLoading(cachedCategories))
             }
         }

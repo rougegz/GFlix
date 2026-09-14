@@ -65,7 +65,7 @@ class AniWorldUpdateTvShowWorker(
                         }
                         updateJobs.awaitAll()
                         prefs.edit() { putBoolean(KEY_PROCESSED_FILE, true) }
-                        AniWorldProvider.invalidateCache()
+                        // no-op: legacy provider cache gone
                     } catch (e: Exception) {
                         Log.e("AniWorldWorker", "Failed to process JSON", e)
                     }
@@ -94,7 +94,7 @@ class AniWorldUpdateTvShowWorker(
                 jobs.awaitAll()
             }
             prefs.edit() { putBoolean(AFTER_BOOTUP_ANIWORLD, true) }
-            AniWorldProvider.invalidateCache()
+            // no-op: legacy provider cache gone
             Log.d("AniWorldWorker", "All updates completed")
             Result.success()
 

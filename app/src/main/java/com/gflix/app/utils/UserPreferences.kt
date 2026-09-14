@@ -485,6 +485,13 @@ object UserPreferences {
         get() = Key.CURRENT_EXTENSION_ID.getString() ?: ""
         set(value) = Key.CURRENT_EXTENSION_ID.setString(value)
 
+    // Legacy TMDB metadata toggle. The TMDB settings UI is gone (extension-only
+    // catalogs), but parental-control gating still reads this flag; it defaults
+    // to true so existing behavior is preserved. No writer besides tests.
+    var enableTmdb: Boolean
+        get() = Key.ENABLE_TMDB.getBoolean() ?: true
+        set(value) = Key.ENABLE_TMDB.setBoolean(value)
+
     fun getFavoriteCategoryOrder(providerName: String): List<String> {
         val key = "FAVORITE_CATEGORY_ORDER_$providerName"
         val saved = prefs.getString(key, null)

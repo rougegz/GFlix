@@ -51,10 +51,6 @@ import com.gflix.app.fragments.movie.MovieMobileFragment
 import com.gflix.app.fragments.movie.MovieMobileFragmentDirections
 import com.gflix.app.fragments.movie.MovieTvFragment
 import com.gflix.app.fragments.movie.MovieTvFragmentDirections
-import com.gflix.app.fragments.movies.MoviesMobileFragment
-import com.gflix.app.fragments.movies.MoviesMobileFragmentDirections
-import com.gflix.app.fragments.movies.MoviesTvFragment
-import com.gflix.app.fragments.movies.MoviesTvFragmentDirections
 import com.gflix.app.fragments.people.PeopleMobileFragment
 import com.gflix.app.fragments.people.PeopleMobileFragmentDirections
 import com.gflix.app.fragments.people.PeopleTvFragment
@@ -67,8 +63,6 @@ import com.gflix.app.fragments.tv_show.TvShowMobileFragment
 import com.gflix.app.fragments.tv_show.TvShowMobileFragmentDirections
 import com.gflix.app.fragments.tv_show.TvShowTvFragment
 import com.gflix.app.fragments.tv_show.TvShowTvFragmentDirections
-import com.gflix.app.fragments.tv_shows.TvShowsTvFragment
-import com.gflix.app.fragments.tv_shows.TvShowsTvFragmentDirections
 import com.gflix.app.models.Movie
 import com.gflix.app.models.TvShow
 import com.gflix.app.models.Video
@@ -431,7 +425,6 @@ class MovieViewHolder(
                                 findNavController().navigate(HomeTvFragmentDirections.actionHomeToMovie(id = movie.id))
                             }
                         }
-                        is MoviesTvFragment -> findNavController().navigate(MoviesTvFragmentDirections.actionMoviesToMovie(id = movie.id))
                         is GenreTvFragment -> findNavController().navigate(GenreTvFragmentDirections.actionGenreToMovie(id = movie.id))
                         is SearchTvFragment -> findNavController().navigate(SearchTvFragmentDirections.actionSearchToMovie(id = movie.id))
                         is MovieTvFragment -> findNavController().navigate(MovieTvFragmentDirections.actionMovieToMovie(id = movie.id))
@@ -514,7 +507,6 @@ class MovieViewHolder(
                 checkProviderAndRun {
                     when (context.toActivity()?.getCurrentFragment()) {
                         is GenreMobileFragment -> findNavController().navigate(GenreMobileFragmentDirections.actionGenreToMovie(id = movie.id))
-                        is MoviesMobileFragment -> findNavController().navigate(MoviesMobileFragmentDirections.actionMoviesToMovie(id = movie.id))
                         is PeopleMobileFragment -> findNavController().navigate(PeopleMobileFragmentDirections.actionPeopleToMovie(id = movie.id))
                         is SearchMobileFragment -> findNavController().navigate(SearchMobileFragmentDirections.actionSearchToMovie(id = movie.id))
                         is FavoritesMobileFragment -> findNavController().navigate(FavoritesMobileFragmentDirections.actionFavoritesToMovie(id = movie.id))
@@ -578,7 +570,6 @@ class MovieViewHolder(
                 checkProviderAndRun {
                     when (context.toActivity()?.getCurrentFragment()) {
                         is HomeTvFragment -> findNavController().navigate(HomeTvFragmentDirections.actionHomeToMovie(id = movie.id))
-                        is MoviesTvFragment -> findNavController().navigate(MoviesTvFragmentDirections.actionMoviesToMovie(id = movie.id))
                         is GenreTvFragment -> findNavController().navigate(GenreTvFragmentDirections.actionGenreToMovie(id = movie.id))
                         is SearchTvFragment -> findNavController().navigate(SearchTvFragmentDirections.actionSearchToMovie(id = movie.id))
                         is PeopleTvFragment -> findNavController().navigate(PeopleTvFragmentDirections.actionPeopleToMovie(id = movie.id))

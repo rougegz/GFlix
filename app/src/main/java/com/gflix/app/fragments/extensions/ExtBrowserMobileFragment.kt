@@ -10,6 +10,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -96,8 +97,7 @@ open class ExtBrowserMobileFragment : Fragment() {
                         viewModel.selectExtension(meta.internalName) { ok ->
                             toastResult(ok)
                             if (ok) runCatching {
-                                androidx.navigation.fragment.findNavController(this@ExtBrowserMobileFragment)
-                                    .navigate(com.gflix.app.R.id.home)
+                                findNavController().navigate(com.gflix.app.R.id.home)
                             }
                         }
                     }

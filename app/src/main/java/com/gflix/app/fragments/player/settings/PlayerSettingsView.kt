@@ -352,6 +352,8 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
 
             player.playbackParameters = player.playbackParameters
                 .withSpeed(speed.value)
+            // Remember-My-Choices: carry speed to the next episode/player.
+            com.gflix.app.utils.UserPreferences.playbackSpeed = speed.value
         }
 
     protected var onExtraBufferingListener: ((Boolean) -> Unit)? = null
@@ -1236,6 +1238,7 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
 
                 val selected: Speed
                     get() = list.find { it.isSelected }
+                        ?: list.find { it.value == com.gflix.app.utils.UserPreferences.playbackSpeed }
                         ?: list.find { it.value == 1F }
                         ?: DEFAULT
 

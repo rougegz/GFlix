@@ -1767,6 +1767,9 @@ class PlayerTvFragment : Fragment() {
                                 .build()
                     }
 
+                    // Remember-My-Choices: restore speed picked in a previous episode.
+                    player.setPlaybackSpeed(UserPreferences.playbackSpeed)
+
                     mediaSession = MediaSession.Builder(requireContext(), player)
                         .build()
                 }

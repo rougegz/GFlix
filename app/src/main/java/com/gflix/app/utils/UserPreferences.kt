@@ -164,6 +164,13 @@ object UserPreferences {
             Key.SERVER_AUTO_SUBTITLES_DISABLED.setBoolean(value)
         }
 
+    // Remember-My-Choices: playback speed carries to the next episode/player.
+    var playbackSpeed: Float
+        get() = Key.PLAYBACK_SPEED.getFloat() ?: 1F
+        set(value) {
+            Key.PLAYBACK_SPEED.setFloat(value)
+        }
+
     var selectedTheme: String
         get() = Key.SELECTED_THEME.getString() ?: "default"
         set(value) = Key.SELECTED_THEME.setString(value)
@@ -560,6 +567,7 @@ object UserPreferences {
         FORCE_EXTRA_BUFFERING,
         AUTOPLAY_BUFFER,
         SERVER_AUTO_SUBTITLES_DISABLED,
+        PLAYBACK_SPEED,
         ENABLE_TMDB,
         PARENTAL_CONTROL_PIN,
         PARENTAL_CONTROL_ADMIN_PIN,

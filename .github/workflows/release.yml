@@ -76,7 +76,7 @@ jobs:
           fi
           echo "apksigner: $APKSIGNER"
           for apk in /tmp/gflix-apks/*.apk; do
-            "$APKSIGNER" sign --ks "$KS" --ks-pass:"$KSP" --key-pass:"$KP" \
+            "$APKSIGNER" sign --ks "$KS" --ks-pass "pass:$KSP" --key-pass "pass:$KP" \
               --ks-key-alias "$ALIAS" --out "${apk%.apk}-signed.apk" "$apk"
             mv "${apk%.apk}-signed.apk" "$apk"
             "$APKSIGNER" verify --print-certs "$apk" | head -n 2

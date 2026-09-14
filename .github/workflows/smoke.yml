@@ -1,0 +1,12 @@
+name: Smoke
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo smoke-ok

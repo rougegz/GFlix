@@ -62,7 +62,9 @@ jobs:
           # release keystore when secrets exist, else generate an ephemeral
           # debug key so sideloaded APKs install (assets get a -debug suffix).
           umask 077
-          KS="$(mktemp /tmp/gflix-ks.XXXXXXXX)"
+          # -u: print a unique name without creating it (keytool refuses
+          # pre-existing empty files); trap still guarantees cleanup.
+          KS="$(mktemp -u /tmp/gflix-ks.XXXXXXXX)"
           trap 'rm -f "$KS"' EXIT
           if [ -n "$KEYSTORE_B64" ]; then
             printf '%s' "$KEYSTORE_B64" | base64 -d > "$KS"

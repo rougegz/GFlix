@@ -102,7 +102,7 @@ class RepoManager(private val http: HttpGet) {
                 it.copy(repositoryUrl = it.repositoryUrl ?: url)
             }
             val repo = CsRepo(
-                name = hostOf(url),
+                name = (hostOf(url) ?: url).ifBlank { url },
                 description = "Pasted plugin list",
                 pluginLists = listOf(url),
                 url = url

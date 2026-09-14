@@ -46,13 +46,15 @@ open class ExtBrowserMobileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.available.collect { available ->
-                listView.text = if (available.isEmpty()) {
-                    "No extensions. Add a repo first."
-                } else {
-                    available.joinToString("\n") {
-                        "• ${it.name} v${it.version} [${it.language ?: "?"}]" +
-                            (it.tvTypes.takeIf { t -> t.isNotEmpty() }?.joinToString("/") ?: "")
+            viewLifecycleOwner.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+                viewModel.available.collect { available ->
+                    listView.text = if (available.isEmpty()) {
+                        "No extensions. Add a repo first."
+                    } else {
+                        available.joinToString("\n") {
+                            "\u2022 ${it.name} v${it.version} [${it.language ?: "?"}]" +
+                                (it.tvTypes.takeIf { t -> t.isNotEmpty() }?.joinToString("/") ?: "")
+                        }
                     }
                 }
             }

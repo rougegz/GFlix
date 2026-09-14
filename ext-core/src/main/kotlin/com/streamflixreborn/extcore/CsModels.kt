@@ -55,8 +55,15 @@ data class CsExtensionMeta(
         require(name.isNotBlank()) { "Extension name must not be blank" }
         require(internalName.isNotBlank()) { "internalName must not be blank" }
         require(url.isNotBlank()) { "Extension url must not be blank" }
-        require(url.endsWith(".cs3") || url.endsWith(".zip")) {
+        val clean = url.substringBefore("?").lowercase()
+        require(clean.endsWith(".cs3") || clean.endsWith(".zip")) {
             "Extension url must end with .cs3 or .zip: $url"
+        }
+        require(isHttpsOrLocalhost(url)) {
+            "Extension url must be https (localhost http allowed for tests): $url"
+        }
+        require(!isBlockedHost(hostOf(url))) {
+            "Blocked host in extension url: $url"
         }
     }
 }
@@ -152,7 +159,50 @@ const val SUPPORTED_MANIFEST_MIN = 1
 /** Storage layout: files/Extensions/<repoHash>/<sanitized>.cs3 */
 fun sanitizeExtensionFileName(name: String): String {
     val base = name.replace(Regex("[^a-zA-Z0-9._-]"), "_").take(80).ifBlank { "ext" }
-    return "$base.${kotlin.math.abs(name.hashCode())}"
+    // toUInt hex avoids Int.MIN_VALUE abs() bug and keeps names filesystem-safe.
+    val suffix = name.hashCode().toUInt().toString(16)
+    return "$base.$suffix"
+}
+
+
+/** Hosts that must never be fetched (SSRF): loopback (except explicit localhost tests), RFC1918, link-local, etc. */
+fun isBlockedHost(host: String?): Boolean {
+    if (host.isNullOrBlank()) return true
+    val h = host.lowercase().substringBefore(":")
+    if (h == "localhost") return false
+    if (h == "127.0.0.1" || h == "0.0.0.0" || h == "::1" || h == "[::1]") return true
+    if (h.contains("@") || h.contains(" ") || h.contains("\\")) return true
+    fun ipv4(s: String): List<Int>? {
+        val parts = s.split(".")
+        if (parts.size != 4) return null
+        return runCatching { parts.map { it.toInt() } }.getOrNull()
+            ?.takeIf { it.all { n -> n in 0..255 } }
+    }
+    val ip = ipv4(h)
+    if (ip != null) {
+        if (ip[0] == 10) return true
+        if (ip[0] == 172 && ip[1] in 16..31) return true
+        if (ip[0] == 192 && ip[1] == 168) return true
+        if (ip[0] == 169 && ip[1] == 254) return true
+        if (ip[0] == 127) return true
+        if (ip[0] == 0) return true
+        return false
+    }
+    if (h.endsWith(".local") || h.endsWith(".internal") || h.endsWith(".lan")) return true
+    if (h == "metadata.google.internal") return true
+    return false
+}
+
+fun hostOf(url: String): String? = runCatching {
+    val afterScheme = url.substringAfter("://", "")
+    afterScheme.substringBefore("/").substringBefore("?").substringBefore("#")
+}.getOrNull()
+/** True for https://… or http://localhost|127.0.0.1 (tests only). */
+fun isHttpsOrLocalhost(url: String): Boolean {
+    if (url.startsWith("https://")) return true
+    if (!url.startsWith("http://")) return false
+    val host = url.removePrefix("http://").substringBefore("/").substringBefore(":")
+    return host == "localhost" || host == "127.0.0.1"
 }
 
 fun repoFolderName(repositoryUrl: String): String =

@@ -28,6 +28,9 @@ fun normalizeRepoUrl(raw: String): String {
             "Only https URLs allowed (http permitted for localhost tests only)"
         }
     }
+    require(!isBlockedHost(hostOf(withScheme))) {
+        "Blocked host in repository URL: $withScheme"
+    }
     return withScheme.trimEnd('/')
 }
 
@@ -49,20 +52,28 @@ class RepoManager(private val http: HttpGet) {
     private val repos = linkedMapOf<String, CsRepo>()
     private val listings = linkedMapOf<String, List<CsExtensionMeta>>()
 
-    suspend fun addRepo(rawUrl: String): CsRepo = mutex.withLock {
+    suspend fun addRepo(rawUrl: String): CsRepo {
+        // Network I/O outside the lock: holding a mutex across http.get()
+        // stalls every other repo op for seconds.
         val url = normalizeRepoUrl(rawUrl)
         val repoJson = http.get(url)
         val repo = parseRepository(repoJson, url)
         val plugins = mutableListOf<CsExtensionMeta>()
-        for (listUrl in repo.pluginLists) {
+        for (rawListUrl in repo.pluginLists) {
+            // Plugin-list URLs come from repo content: enforce https too so a
+            // malicious repository.json cannot downgrade us to http (MITM).
+            val listUrl = normalizeRepoUrl(rawListUrl)
             val listJson = http.get(listUrl)
             plugins += parsePluginList(listJson).map {
                 it.copy(repositoryUrl = it.repositoryUrl ?: url)
             }
         }
-        repos[url] = repo
-        listings[url] = plugins.distinctBy { it.internalName }
-        repo
+        val deduped = plugins.distinctBy { "${it.repositoryUrl}|${it.internalName}" }
+        mutex.withLock {
+            repos[url] = repo
+            listings[url] = deduped
+        }
+        return repo
     }
 
     suspend fun removeRepo(rawUrl: String): Boolean = mutex.withLock {
@@ -87,6 +98,7 @@ class RepoManager(private val http: HttpGet) {
             val url = normalizeRepoUrl(repoUrl)
             return listings[url] ?: emptyList()
         }
-        return listings.values.flatten().distinctBy { it.internalName }
+        // Namespace by repo so a rogue repo cannot shadow another repo's id.
+        return listings.values.flatten().distinctBy { "${it.repositoryUrl}|${it.internalName}" }
     }
 }

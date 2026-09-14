@@ -6,6 +6,8 @@ sources ship with the app — you add repository URLs, then install extensions.
 ## 1. Install a repo
 
 1. Open **Settings → Extensions & Repositories → Repos**.
+   Private/SSRF hosts (`10/8`, `172.16/12`, `192.168/16`, `169.254/16`,
+   `metadata.google.internal`, `*.local`) are rejected; only `https` (+ `localhost` http for tests).
 2. Paste a `repository.json` URL (example:
    `https://example.com/repository.json`).
 3. Only `https` URLs are accepted (`http` works for `localhost` tests only).
@@ -26,8 +28,10 @@ sources ship with the app — you add repository URLs, then install extensions.
 
 Open **Extensions**. Each row shows icon, version, language, types.
 
-- **Install**: downloads the `.cs3`, verifies `sha256-<hex>` (`fileHash`) when
-  present, stores it at `files/Extensions/<repo>/<id>.cs3` (read-only).
+- **Install**: downloads the `.cs3` over `https` (10s connect / 15s read
+  timeouts, no `https`→`http` downgrade redirects, 50 MB cap), requires
+  `sha256-<hex>` (`fileHash`) except `localhost` test URLs, stores it at
+  `files/Extensions/<repo>/<id>.cs3` (read-only, canonical-path checked).
 - **Update**: offered when the repo `version` is newer (or `-1` always-update).
 - **Disable**: keeps the file, skips it in search/playback.
 - **Delete extension**: removes the `.cs3` (+ `oat` sidecar) and its DB row.

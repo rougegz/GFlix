@@ -12,9 +12,18 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import java.util.concurrent.TimeUnit
 
 /** OkHttp-backed [HttpGet] for repo JSON (5-min cache lives in Room later). */
-class OkHttpGet(private val client: OkHttpClient = OkHttpClient()) : HttpGet {
+class OkHttpGet(
+    private val client: OkHttpClient = OkHttpClient.Builder()
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(15, TimeUnit.SECONDS)
+        .followRedirects(true)
+        .followSslRedirects(false)
+        .retryOnConnectionFailure(false)
+        .build()
+) : HttpGet {
     override suspend fun get(url: String): String {
         val req = Request.Builder().url(url)
             .header("User-Agent", "Streamflix-Extensions/1.0")
@@ -50,25 +59,29 @@ class ExtensionsViewModel(
 
     fun refresh() = viewModelScope.launch(Dispatchers.IO) {
         _loading.value = true
-        runCatching {
+        try {
             _repos.value = repoManager.listRepos()
             _available.value = repoManager.listAvailable()
-        }.onFailure { _error.value = it.message }
-        _loading.value = false
+        } catch (e: Exception) {
+            _error.value = e.message
+        } finally {
+            _loading.value = false
+        }
     }
 
     fun addRepo(url: String, onDone: (Boolean) -> Unit = {}) = viewModelScope.launch(Dispatchers.IO) {
         _loading.value = true
-        val ok = runCatching {
+        var ok = false
+        try {
             repoManager.addRepo(url)
             _repos.value = repoManager.listRepos()
             _available.value = repoManager.listAvailable()
-            true
-        }.getOrElse {
-            _error.value = it.message
-            false
+            ok = true
+        } catch (e: Exception) {
+            _error.value = e.message
+        } finally {
+            _loading.value = false
         }
-        _loading.value = false
         onDone(ok)
     }
 

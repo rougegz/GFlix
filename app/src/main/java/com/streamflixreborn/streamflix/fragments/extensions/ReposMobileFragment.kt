@@ -63,11 +63,13 @@ open class ReposMobileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.repos.collect { repos ->
-                statusView.text = if (repos.isEmpty()) {
-                    "No repos yet. Paste a repository.json URL above."
-                } else {
-                    repos.joinToString("\n") { "• ${it.name} — ${it.url}" }
+            viewLifecycleOwner.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+                viewModel.repos.collect { repos ->
+                    statusView.text = if (repos.isEmpty()) {
+                        "No repos yet. Paste a repository.json URL above."
+                    } else {
+                        repos.joinToString("\n") { "• ${it.name} — ${it.url}" }
+                    }
                 }
             }
         }

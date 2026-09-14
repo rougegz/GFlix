@@ -17,44 +17,47 @@ import okhttp3.OkHttpClient
 object ExtLinkResolver {
 
     fun resolveVideos(links: List<ExtLink>): List<Video> =
-        CloudStreamAdapter.sortBestFirst(links).map { CloudStreamAdapter.toVideo(it) }
+        CloudStreamAdapter.sortBestFirst(links).mapNotNull { CloudStreamAdapter.toVideoOrNull(it) }
 
-    fun toMediaItems(
-        videos: List<Video>,
-        client: OkHttpClient,
-        title: String = ""
-    ): List<MediaItem> {
-        val factory = OkHttpDataSource.Factory(client)
-        return videos.map { video ->
-            val headers = (video.headers ?: emptyMap()).toMutableMap().apply {
-                putIfAbsent("User-Agent", DEFAULT_UA)
-            }
-            val mime = when {
-                video.source.contains(".m3u8", true) || video.type == "m3u8" -> MimeTypes.APPLICATION_M3U8
-                video.source.contains(".mpd", true) -> MimeTypes.APPLICATION_MPD
-                else -> MimeTypes.VIDEO_MP4
-            }
-            // Per-link headers ride on the request via OkHttpDataSource defaults;
-            // the ExoPlayer source factory is shared, headers vary per item URI.
-            MediaItem.Builder()
-                .setUri(video.source)
-                .setMimeType(mime)
-                .setMediaMetadata(
-                    androidx.media3.common.MediaMetadata.Builder()
-                        .setTitle(title)
-                        .build()
-                )
-                .build()
-        }.also {
-            // Factory retained by caller for the MediaSource; headers are applied
-            // per-request by the player's data-source layer (see PlayerV2 wiring).
-            @Suppress("UNUSED_EXPRESSION") factory
-            @Suppress("UNUSED_VARIABLE") val unusedHeaders = headersOf(videos)
+    /** Headers actually sent for a link (Referer + stored headers + UA). */
+    fun requestHeaders(link: ExtLink): Map<String, String> =
+        (link.headers + mapOf("Referer" to link.referer))
+            .filterValues { it.isNotBlank() }
+            .toMutableMap()
+            .apply { putIfAbsent("User-Agent", DEFAULT_UA) }
+
+    /** Per-link ExoPlayer data-source factory: headers are set as request defaults. */
+    fun dataSourceFactory(link: ExtLink, client: OkHttpClient): OkHttpDataSource.Factory =
+        OkHttpDataSource.Factory(client).setDefaultRequestProperties(requestHeaders(link))
+
+    fun mediaItem(link: ExtLink, title: String = ""): MediaItem {
+        val mime = when {
+            link.url.contains(".m3u8", true) || link.isM3u8 -> MimeTypes.APPLICATION_M3U8
+            link.url.contains(".mpd", true) -> MimeTypes.APPLICATION_MPD
+            else -> MimeTypes.VIDEO_MP4
         }
+        return MediaItem.Builder()
+            .setUri(link.url)
+            .setMimeType(mime)
+            .setMediaMetadata(
+                androidx.media3.common.MediaMetadata.Builder().setTitle(title).build()
+            )
+            .build()
     }
 
-    private fun headersOf(videos: List<Video>): Map<String, String> =
-        videos.firstOrNull()?.headers ?: emptyMap()
+    /**
+     * Paired items + factories for a link list. The player must use
+     * `factories[i]` for `items[i]` (or rebuild per link on fallback) —
+     * headers differ per link and cannot ride on one shared factory.
+     */
+    fun toMediaItems(
+        links: List<ExtLink>,
+        client: OkHttpClient,
+        title: String = ""
+    ): Pair<List<MediaItem>, List<OkHttpDataSource.Factory>> {
+        val sorted = CloudStreamAdapter.sortBestFirst(links)
+        return Pair(sorted.map { mediaItem(it, title) }, sorted.map { dataSourceFactory(it, client) })
+    }
 
     const val DEFAULT_UA =
         "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Mobile Safari/537.36"

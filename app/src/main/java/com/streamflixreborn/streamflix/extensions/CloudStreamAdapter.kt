@@ -38,6 +38,9 @@ object CloudStreamAdapter {
         )
     }
 
+    /** Non-throwing variant: one bad link never kills the whole list. */
+    fun toVideoOrNull(link: ExtLink): Video? = runCatching { toVideo(link) }.getOrNull()
+
     /** Best-first ordering shared with `:ext-core` (quality desc, m3u8 first). */
     fun sortBestFirst(links: List<ExtLink>): List<ExtLink> = sortLinksBestFirst(links)
 

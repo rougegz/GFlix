@@ -14,7 +14,8 @@ import com.streamflixreborn.streamflix.models.Video
 import com.streamflixreborn.streamflix.providers.Provider
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * Unified [Provider] façade over all *enabled* CloudStream extensions.
@@ -43,15 +44,18 @@ class ExtProviderFacade(
         return tmdbFallback?.getHome() ?: emptyList()
     }
 
-    override suspend fun search(query: String, page: Int): List<AppAdapter.Item> = coroutineScope {
-        if (query.isBlank()) return@coroutineScope emptyList()
+    override suspend fun search(query: String, page: Int): List<AppAdapter.Item> = supervisorScope {
+        if (query.isBlank()) return@supervisorScope emptyList()
         val results = enabled().map { api ->
             async {
-                runCatching { api.search(query).map { it.toItem(api.extensionId) } }
-                    .getOrElse { e ->
-                        Log.w(TAG, "search failed for ${api.extensionId}: ${e.message}")
-                        emptyList()
-                    }
+                // Per-extension timeout: one slow plugin never stalls search.
+                withTimeoutOrNull(PER_API_TIMEOUT_MS) {
+                    runCatching { api.search(query).map { it.toItem(api.extensionId) } }
+                        .getOrElse { e ->
+                            Log.w(TAG, "search failed for ${api.extensionId}: ${e.message}")
+                            emptyList()
+                        }
+                } ?: emptyList()
             }
         }.awaitAll().flatten()
         // De-duplicate by (extensionId, id) to keep stable keys.
@@ -82,22 +86,31 @@ class ExtProviderFacade(
     override suspend fun getPeople(id: String, page: Int): People =
         tmdbFallback?.getPeople(id, page) ?: People(id = id, name = id)
 
-    override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> {
+    override suspend fun getServers(id: String, videoType: Video.Type): List<Video.Server> = supervisorScope {
         val dataUrl = id.substringAfter("ext:", id)
-        val servers = mutableListOf<Video.Server>()
-        for (api in enabled()) {
-            val links = runCatching { api.loadLinks(dataUrl) }.getOrElse {
-                Log.w(TAG, "loadLinks failed for ${api.extensionId}: ${it.message}")
-                emptyList()
+        // Parallel fan-out with per-extension timeout; failures isolated.
+        val perApi = enabled().map { api ->
+            async {
+                withTimeoutOrNull(PER_API_TIMEOUT_MS) {
+                    runCatching { api.loadLinks(dataUrl) }.getOrElse {
+                        Log.w(TAG, "loadLinks failed for ${api.extensionId}: ${it.message}")
+                        emptyList()
+                    }
+                } ?: emptyList()
             }
-            CloudStreamAdapter.sortBestFirst(links).forEachIndexed { index, link ->
-                val server = CloudStreamAdapter.toServer(link, servers.size + index)
-                server.video = CloudStreamAdapter.toVideo(link)
+        }.awaitAll()
+        val servers = mutableListOf<Video.Server>()
+        var counter = 0
+        for (links in perApi) {
+            for (link in CloudStreamAdapter.sortBestFirst(links)) {
+                val server = CloudStreamAdapter.toServer(link, counter++)
+                // One bad link never kills the list.
+                server.video = CloudStreamAdapter.toVideoOrNull(link) ?: continue
                 servers += server
             }
         }
         if (servers.isEmpty()) throw IllegalStateException("No extension links for $id")
-        return servers
+        servers
     }
 
     override suspend fun getVideo(server: Video.Server): Video {
@@ -120,5 +133,6 @@ class ExtProviderFacade(
 
     companion object {
         private const val TAG = "ExtProviderFacade"
+        private const val PER_API_TIMEOUT_MS = 8_000L
     }
 }

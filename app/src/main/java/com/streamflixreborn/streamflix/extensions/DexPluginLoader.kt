@@ -13,7 +13,11 @@ import java.util.zip.ZipFile
  * via an isolated [PathClassLoader]. Mirrors upstream
  * `PluginManager.loadPlugin` (PathClassLoader + manifest.json reflection).
  *
- * Only this class touches Dex APIs; everything else depends on [LoadedPlugin].
+ * Security note: [PathClassLoader] does NOT sandbox the plugin — Dex code runs
+ * in-process with full reflection access to app classes. Mitigations applied
+ * here: app-private read-only storage, `sha256-<hex>` verification before
+ * first load (see [ExtensionActions]), manifest allow-listing, and no secrets
+ * passed through the plugin classloader. A remote-process host is future work.
  */
 class DexPluginLoader(private val context: Context) {
 
@@ -34,21 +38,35 @@ class DexPluginLoader(private val context: Context) {
         }
         val manifest = readManifest(cs3File).also { it.requireValid() }
         cleanupOatLeftovers(cs3File)
-        // Isolated loader: parent is the app classloader, no app classes exposed for write.
+        // Parent is the app classloader so the plugin can call the extension
+        // API surface; this is NOT a sandbox (see class KDoc).
         val loader = PathClassLoader(cs3File.absolutePath, context.classLoader)
         val className = manifest.pluginClassName!!
+        // Allow-list class names: FQCN with 1+ dots, no spaces/separators (defense-in-depth;
+        // Dex still runs in-process by design, so hash verification stays the real gate).
+        require(className.matches(Regex("^[a-zA-Z_][a-zA-Z0-9_]*(\\.[a-zA-Z_][a-zA-Z0-9_]*)+$"))) {
+            "Refusing suspicious plugin class: $className"
+        }
         Log.d(TAG, "Loading extension $internalName -> $className")
-        val clazz = loader.loadClass(className)
-        val instance = clazz.getDeclaredConstructor().newInstance()
-        cs3File.setReadOnly()
-        return LoadedPlugin(internalName, manifest, loader, instance as Any, cs3File)
+        val clazz = runCatching { loader.loadClass(className) }
+            .getOrElse { throw IllegalStateException("Plugin class not found: $className", it) }
+        val instance = runCatching { clazz.getDeclaredConstructor().newInstance() }
+            .getOrElse { throw IllegalStateException("Plugin has no public no-arg constructor: $className", it) }
+            ?: throw IllegalStateException("Plugin instantiation returned null: $className")
+        check(cs3File.setReadOnly()) { "Failed to set extension read-only: ${cs3File.absolutePath}" }
+        return LoadedPlugin(internalName, manifest, loader, instance, cs3File)
     }
 
     fun readManifest(cs3File: File): CsManifest {
         ZipFile(cs3File).use { zip ->
             val entry = zip.getEntry("manifest.json")
                 ?: throw IllegalStateException("No manifest.json in ${cs3File.name}")
-            val text = zip.getInputStream(entry).bufferedReader().readText()
+            // Zip-bomb guard: reject absurd declared sizes before reading.
+            val declared = entry.size
+            require(declared in 1..MAX_MANIFEST_CHARS) { "Bad manifest size: $declared" }
+            val bytes = zip.getInputStream(entry).use { it.readNBytes(MAX_MANIFEST_CHARS + 1) }
+            require(bytes.size <= MAX_MANIFEST_CHARS) { "manifest.json too large" }
+            val text = bytes.toString(Charsets.UTF_8)
             return json.decodeFromString(CsManifest.serializer(), text)
         }
     }
@@ -58,8 +76,11 @@ class DexPluginLoader(private val context: Context) {
         runCatching {
             val oatDir = File(cs3File.parent, "oat")
             if (oatDir.isDirectory) {
+                val prefix = cs3File.nameWithoutExtension + "."
                 oatDir.listFiles()?.forEach { file ->
-                    if (file.name.contains(cs3File.nameWithoutExtension)) runCatching { file.delete() }
+                    if (file.name == cs3File.nameWithoutExtension || file.name.startsWith(prefix)) {
+                        runCatching { file.delete() }
+                    }
                 }
             }
         }
@@ -67,6 +88,7 @@ class DexPluginLoader(private val context: Context) {
 
     companion object {
         private const val TAG = "DexPluginLoader"
+        private const val MAX_MANIFEST_CHARS = 1_048_576
 
         /** App-private storage: files/Extensions/<repoFolder>/<file>.cs3 */
         fun pluginFile(context: Context, repoFolder: String, fileName: String): File =

@@ -62,6 +62,14 @@ class RepoManagerTest {
         manager().addRepo("   ")
     }
 
+    @Test fun `blocked hosts rejected`() {
+        assertTrue(isBlockedHost(hostOf("https://169.254.169.254/x.json")))
+        assertTrue(isBlockedHost(hostOf("https://10.0.0.1/x.json")))
+        assertTrue(isBlockedHost(hostOf("https://192.168.1.1/x.json")))
+        assertFalse(isBlockedHost(hostOf("https://example.com/repo.json")))
+        assertFalse(isBlockedHost(hostOf("http://localhost/repo.json")))
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun `add repo rejects plain http`() = runTest {
         manager().addRepo("http://example.com/repo.json")

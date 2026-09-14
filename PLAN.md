@@ -138,3 +138,11 @@ Evidence base:
   VMs/use-cases, thin views.
 - No SDK in this container → mitigate: `:ext-core` pure-JVM + python structural
   gates; Gradle assemble verified where SDK exists.
+
+## Adjacent security follow-ups (out of scope for this slice, do NOT fix here)
+- `BackupRestoreManager.kt:348` zip-slip on restore (`databases/` prefix escape).
+- `AndroidManifest.xml` deep-link `streamflix://resolve?ws=&token=` SSRF/open-redirect
+  (`MainMobileActivity` exported + raw `ws` URL) — enforce `wss://` + allowlist.
+- Global cleartext (`usesCleartextTraffic=true` + `network_security_config.xml`
+  base-config) — flip to `false` once repo/dex traffic is proven https-only.
+- `allowBackup=true` exfiltrates `files/Extensions/*.cs3` + DBs — exclude or disable.

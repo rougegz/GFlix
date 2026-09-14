@@ -486,6 +486,11 @@ object UserPreferences {
             Key.FAVORITE_PROVIDERS.setStringSet(value)
         }
 
+    // CloudStream extensions runtime (Milestone 1, behind flag; default off).
+    var useExtensions: Boolean
+        get() = Key.USE_EXTENSIONS.getBoolean() ?: false
+        set(value) = Key.USE_EXTENSIONS.setBoolean(value)
+
     fun getFavoriteCategoryOrder(providerName: String): List<String> {
         val key = "FAVORITE_CATEGORY_ORDER_$providerName"
         val saved = prefs.getString(key, null)
@@ -566,7 +571,8 @@ object UserPreferences {
         BYPASS_WS_ADVERTISED_HOST,
         UPDATE_CHECK_ENABLED,
         PROVIDER_LANGUAGE,
-        FAVORITE_PROVIDERS;
+        FAVORITE_PROVIDERS,
+        USE_EXTENSIONS;
 
         fun getStringSet(): Set<String>? = when {
             prefs.contains(name) -> prefs.getStringSet(name, null)

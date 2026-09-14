@@ -34,7 +34,6 @@ android {
     def appLayout = properties.getProperty("APP_LAYOUT", "")
     def tmdbKey = properties.getProperty("TMDB_API_KEY", "")
     def subdlKey = properties.getProperty("SUBDL_API_KEY", "")
-    def rabbitApi = properties.getProperty("RABBITSTREAM_SOURCE_API", "")
 
     defaultConfig {
         applicationId "com.gflix.app"
@@ -46,7 +45,6 @@ android {
         buildConfigField "String", "APP_LAYOUT", "\"${appLayout}\""
         buildConfigField "String", "TMDB_API_KEY", "\"${tmdbKey}\""
         buildConfigField "String", "SUBDL_API_KEY", "\"${subdlKey}\""
-        buildConfigField "String", "RABBITSTREAM_SOURCE_API", "\"${rabbitApi}\""
 
         if (file("src/main/cpp/native-lib.cpp").exists()) {
             externalNativeBuild {

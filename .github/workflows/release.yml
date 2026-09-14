@@ -26,7 +26,6 @@ jobs:
         run: |
           touch local.properties
           echo "TMDB_API_KEY=${{ secrets.TMDB_API_KEY }}" >> local.properties
-          echo "RABBITSTREAM_SOURCE_API=${{ secrets.RABBITSTREAM_SOURCE_API }}" >> local.properties
           chmod +x ./gradlew
           mkdir -p /tmp/gflix-apks
 
@@ -49,6 +48,40 @@ jobs:
           ./gradlew assembleRelease --stacktrace
           cp "$(ls app/build/outputs/apk/release/*.apk | head -n 1)" "/tmp/gflix-apks/GFlix-${{ github.ref_name }}-only-tv.apk"
           ls -la /tmp/gflix-apks/
+
+      - name: Sign APKs
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: |
+          # Unsigned APKs cannot be installed on devices. Prefer the real
+          # release keystore when secrets exist, else generate an ephemeral
+          # debug key so sideloaded APKs install.
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > /tmp/gflix-release.keystore
+            KS=/tmp/gflix-release.keystore
+            KSP="$SIGNING_STORE_PASSWORD"; KP="$SIGNING_KEY_PASSWORD"; ALIAS="$SIGNING_KEY_ALIAS"
+          else
+            KS=/tmp/gflix-debug.keystore
+            keytool -genkeypair -keystore "$KS" -alias androiddebugkey \
+              -storepass android -keypass android -keyalg RSA -keysize 2048 \
+              -validity 10950 -dname "CN=GFlix Debug" -noprompt
+            KSP=android; KP=android; ALIAS=androiddebugkey
+          fi
+          APKSIGNER="$(ls -d "$ANDROID_SDK_ROOT"/build-tools/*/apksigner 2>/dev/null | sort -V | tail -n 1)"
+          if [ -z "$APKSIGNER" ]; then
+            APKSIGNER="$(find /usr/local/lib/android /opt/android* /android* -name apksigner 2>/dev/null | sort -V | tail -n 1)"
+          fi
+          echo "apksigner: $APKSIGNER"
+          for apk in /tmp/gflix-apks/*.apk; do
+            "$APKSIGNER" sign --ks "$KS" --ks-pass:"$KSP" --key-pass:"$KP" \
+              --ks-key-alias "$ALIAS" --out "${apk%.apk}-signed.apk" "$apk"
+            mv "${apk%.apk}-signed.apk" "$apk"
+            "$APKSIGNER" verify --print-certs "$apk" | head -n 2
+          done
+          rm -f /tmp/gflix-release.keystore
 
       - name: Publish release
         uses: softprops/action-gh-release@v2

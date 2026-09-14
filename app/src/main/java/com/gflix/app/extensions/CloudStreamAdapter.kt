@@ -46,13 +46,32 @@ object CloudStreamAdapter {
 
     fun toSearchItems(items: List<ExtSearchItem>): List<AppAdapter.Item> {
         // Minimal mapping: movies vs shows by tvType; details fragments resolve the rest.
-        return items.map { item ->
-            if (item.tvType.equals("Movie", true)) {
-                Movie(id = "ext:${item.extensionId}:${item.id}", title = item.title, poster = item.posterUrl)
-            } else {
-                TvShow(id = "ext:${item.extensionId}:${item.id}", title = item.title, poster = item.posterUrl)
+        // Extensions often list every season as its own entry ("Show S1", "Show S2"):
+        // collapse those onto one card per show so seasons don't spam browse rows.
+        return items
+            .distinctBy { item ->
+                val bucket = if (item.tvType.equals("Movie", true)) "m" else "s"
+                "$bucket|${item.extensionId}|${showKey(item.title)}"
             }
-        }
+            .map { item ->
+                if (item.tvType.equals("Movie", true)) {
+                    Movie(id = "ext:${item.extensionId}:${item.id}", title = item.title, poster = item.posterUrl)
+                } else {
+                    TvShow(id = "ext:${item.extensionId}:${item.id}", title = item.title, poster = item.posterUrl)
+                }
+            }
+    }
+
+    private val SEASON_SUFFIX = Regex(
+        """[\s:–\-(\[]*(?:s(?:eason)?\s?\d{1,2}|part\s?\d{1,2}|\d{1,2}\s?(?:st|nd|rd|th)?\s?season)[\s)\]]*$""",
+        RegexOption.IGNORE_CASE
+    )
+
+    fun showKey(title: String): String {
+        var key = title.trim().lowercase()
+            .replace(Regex("""\s+"""), " ")
+        key = SEASON_SUFFIX.replace(key, "").trim().trimEnd(':', '-', '–', '(', '[').trim()
+        return key.ifBlank { title.trim().lowercase() }
     }
 
     fun episodeShell(

@@ -74,7 +74,45 @@ class RepoManager(private val http: HttpGet) {
         // Network I/O outside the lock: holding a mutex across http.get()
         // stalls every other repo op for seconds.
         val url = normalizeRepoUrl(rawUrl)
+        val failures = mutableListOf<String>()
+        var lastError: Exception? = null
+        for (candidate in repoCandidates(url)) {
+            try {
+                return fetchRepo(candidate)
+            } catch (e: Exception) {
+                lastError = e
+                failures += "$candidate: ${e.message?.take(160)}"
+            }
+        }
+        throw IllegalStateException(
+            buildString {
+                append("Repository unreachable")
+                lastError?.message?.let { append(" ($it)") }
+                append(". Tried:\n")
+                failures.distinct().forEach { append("- ").append(it).append('\n') }
+            }
+        )
+    }
+
+    private suspend fun fetchRepo(url: String): CsRepo {
         val repoJson = http.get(url)
+        val trimmed = repoJson.trimStart()
+        if (trimmed.startsWith("[")) {
+            val plugins = parsePluginList(repoJson).map {
+                it.copy(repositoryUrl = it.repositoryUrl ?: url)
+            }
+            val repo = CsRepo(
+                name = hostOf(url),
+                description = "Pasted plugin list",
+                pluginLists = listOf(url),
+                url = url
+            )
+            mutex.withLock {
+                repos[url] = repo
+                listings[url] = plugins.distinctBy { "${it.repositoryUrl}|${it.internalName}" }
+            }
+            return repo
+        }
         val repo = parseRepository(repoJson, url)
         val plugins = mutableListOf<CsExtensionMeta>()
         for (rawListUrl in repo.pluginLists) {
@@ -94,19 +132,45 @@ class RepoManager(private val http: HttpGet) {
         return repo
     }
 
+    companion object {
+        fun repoCandidates(url: String): List<String> {
+            val out = linkedSetOf<String>()
+            out += url
+            val lower = url.substringBefore("?").lowercase()
+            if (lower.endsWith("repo.json")) {
+                out += url.replaceRange(url.length - "repo.json".length, url.length, "repository.json")
+            } else if (lower.endsWith("repository.json")) {
+                out += url.replaceRange(url.length - "repository.json".length, url.length, "repo.json")
+            } else if (!lower.endsWith(".json")) {
+                val base = url.trimEnd('/')
+                out += "$base/repository.json"
+                out += "$base/repo.json"
+                out += "$base/builds/repository.json"
+                out += "$base/builds/repo.json"
+            }
+            return out.toList()
+        }
+    }
+
     suspend fun removeRepo(rawUrl: String): Boolean = mutex.withLock {
         val url = normalizeRepoUrl(rawUrl)
-        listings.remove(url)
-        repos.remove(url) != null
+        val key = resolveKeyLocked(url) ?: url
+        listings.remove(key)
+        repos.remove(key) != null
     }
 
     suspend fun refreshRepo(rawUrl: String): CsRepo {
         // Re-fetch outside the add lock path to keep semantics simple.
         val url = normalizeRepoUrl(rawUrl)
-        val known = mutex.withLock { repos.containsKey(url) }
+        val known = mutex.withLock { resolveKeyLocked(url) != null }
         require(known) { "Unknown repository: $url" }
         // addRepo re-acquires the lock; do not hold it across the call.
         return addRepo(url)
+    }
+
+    private fun resolveKeyLocked(url: String): String? {
+        if (repos.containsKey(url)) return url
+        return repoCandidates(url).firstOrNull { repos.containsKey(it) }
     }
 
     suspend fun listRepos(): List<CsRepo> = mutex.withLock { repos.values.toList() }

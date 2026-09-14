@@ -22,18 +22,12 @@ import com.gflix.app.database.AppDatabase
 import com.gflix.app.databinding.ActivityMainTvBinding
 import com.gflix.app.databinding.ContentHeaderMenuMainTvBinding
 import com.gflix.app.fragments.player.PlayerTvFragment
+import com.gflix.app.providers.ExtensionContentProvider
 import com.gflix.app.ui.UpdateAppTvDialog
-import com.gflix.app.providers.IptvProvider
-import com.gflix.app.providers.Provider
-import com.gflix.app.providers.Cine24hProvider
-import com.gflix.app.providers.FilmyOnlineCcProvider
-import com.gflix.app.providers.ZaluknijProvider
-import com.gflix.app.providers.GuardaSerieProvider
 import com.gflix.app.utils.AppLanguageManager
 import com.gflix.app.utils.ThemeManager
 import com.gflix.app.utils.UserPreferences
 import com.gflix.app.utils.getCurrentFragment
-import com.gflix.app.providers.AnimeOnlineNinjaProvider
 import kotlinx.coroutines.launch
 
 class MainTvActivity : FragmentActivity() {
@@ -54,13 +48,6 @@ class MainTvActivity : FragmentActivity() {
         setTheme(ThemeManager.tvThemeRes(UserPreferences.selectedTheme))
         
         super.onCreate(savedInstanceState)
-        
-        // Inizializza il provider con il context dell'attività per gestire eventuali bypass visibili
-        AnimeOnlineNinjaProvider.init(this)
-        Cine24hProvider.init(this)
-        FilmyOnlineCcProvider.init(this)
-        ZaluknijProvider.init(this)
-        GuardaSerieProvider.init(this)
 
         _binding = ActivityMainTvBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -87,8 +74,10 @@ class MainTvActivity : FragmentActivity() {
         }
 
         if (savedInstanceState == null) {
-            UserPreferences.currentProvider?.let {
-                navController.navigate(R.id.home)
+            val hasExt = UserPreferences.useExtensions ||
+                UserPreferences.currentExtensionId.isNotBlank()
+            if (!hasExt) {
+                runCatching { navController.navigate(R.id.ext_repos) }
             }
         }
 
@@ -104,11 +93,13 @@ class MainTvActivity : FragmentActivity() {
                 val header = ContentHeaderMenuMainTvBinding.bind(this)
 
                 Glide.with(context)
-                    .load(UserPreferences.currentProvider?.logo?.takeIf { it.isNotEmpty() } ?: R.drawable.ic_provider_default_logo)
+                    .load(R.drawable.ic_provider_default_logo)
                     .error(R.drawable.ic_provider_default_logo)
                     .into(header.ivNavigationHeaderIcon)
-                header.tvNavigationHeaderTitle.text = UserPreferences.currentProvider?.name
-                header.tvNavigationHeaderSubtitle.text = getString(R.string.main_menu_change_provider)
+                val currentExt = UserPreferences.currentExtensionId
+                header.tvNavigationHeaderTitle.text =
+                    currentExt.ifBlank { getString(R.string.ext_settings_title) }
+                header.tvNavigationHeaderSubtitle.text = getString(R.string.ext_settings_summary)
                 val palette = ThemeManager.palette(UserPreferences.selectedTheme)
                 header.tvNavigationHeaderTitle.setTextColor(palette.tvHeaderPrimary)
                 header.tvNavigationHeaderSubtitle.setTextColor(palette.tvHeaderSecondary)
@@ -124,8 +115,7 @@ class MainTvActivity : FragmentActivity() {
                 }
 
                 setOnClickListener {
-                    // Navigazione manuale per evitare dipendenza da Safe Args Directions non generate
-                    navController.navigate(R.id.providers)
+                    navController.navigate(R.id.ext_browser)
                 }
             }
 
@@ -199,13 +189,10 @@ class MainTvActivity : FragmentActivity() {
     }
     
     private fun updateNavigationVisibility() {
-        UserPreferences.currentProvider?.let { provider ->
-            binding.navMain.menu.findItem(R.id.movies)?.isVisible = Provider.supportsMovies(provider)
-            val tvShowsItem = binding.navMain.menu.findItem(R.id.tv_shows)
-            tvShowsItem?.isVisible = Provider.supportsTvShows(provider)
-            tvShowsItem?.title = if (provider is IptvProvider)
-                getString(R.string.main_menu_all_channels) else getString(R.string.main_menu_tv_shows)
-        }
+        binding.navMain.menu.findItem(R.id.movies)?.isVisible =
+            ExtensionContentProvider.let { com.gflix.app.providers.Provider.supportsMovies(it) }
+        binding.navMain.menu.findItem(R.id.tv_shows)?.isVisible =
+            ExtensionContentProvider.let { com.gflix.app.providers.Provider.supportsTvShows(it) }
     }
 
     fun adjustLayoutDelta(deltaX: Int?, deltaY: Int?) {

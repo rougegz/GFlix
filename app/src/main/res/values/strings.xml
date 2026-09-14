@@ -240,6 +240,10 @@
     <string name="ext_selector_none">Select extension</string>
     <string name="ext_settings_title">Extensions and repositories</string>
     <string name="ext_settings_summary">Add repos, install and manage CloudStream extensions</string>
+    <string name="ext_repos_title">Repositories</string>
+    <string name="ext_repos_summary">Add or remove extension repositories</string>
+    <string name="ext_browser_title">Extensions</string>
+    <string name="ext_browser_summary">Install, select and manage extensions</string>
     <string name="player_audio_unsupported_video_only">Audio format not supported — playing video only</string>
     <string name="player_settings_speed_label">Speed</string>
     <string name="player_settings_speed_0_25">× 0.25</string>

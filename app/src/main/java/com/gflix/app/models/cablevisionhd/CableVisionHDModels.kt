@@ -1,7 +1,6 @@
 package com.gflix.app.models.cablevisionhd
 
 import com.gflix.app.models.TvShow
-import com.gflix.app.providers.CableVisionHDProvider
 import org.jsoup.nodes.Document
 
 fun Document.toTvShows(providerName: String): List<TvShow> {

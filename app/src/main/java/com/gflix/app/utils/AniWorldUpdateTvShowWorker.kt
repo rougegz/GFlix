@@ -16,7 +16,7 @@ import retrofit2.HttpException
 import java.io.File
 import androidx.core.content.edit
 import com.gflix.app.database.AniWorldDatabase
-import com.gflix.app.providers.AniWorldProvider
+import com.gflix.app.providers.ExtensionContentProvider
 
 class AniWorldUpdateTvShowWorker(
     context: Context,
@@ -29,7 +29,7 @@ class AniWorldUpdateTvShowWorker(
     }
 
     private val dao = AniWorldDatabase.getInstance(context).tvShowDao()
-    private val provider = AniWorldProvider
+    private val provider = ExtensionContentProvider
     private val gson = Gson()
 
     override suspend fun doWork(): Result = coroutineScope {

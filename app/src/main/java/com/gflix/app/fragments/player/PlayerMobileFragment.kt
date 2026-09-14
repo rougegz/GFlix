@@ -59,8 +59,6 @@ import com.gflix.app.models.Season
 import com.gflix.app.models.TvShow
 import com.gflix.app.models.Video
 import com.gflix.app.models.WatchItem
-import com.gflix.app.providers.SerienStreamProvider
-import com.gflix.app.sync.CloudSyncHooks
 import com.gflix.app.ui.PlayerMobileView
 import com.gflix.app.utils.MediaServer
 import com.gflix.app.utils.SubtitleOffsetRenderersFactory
@@ -841,7 +839,6 @@ class PlayerMobileFragment : Fragment() {
                                     isWatching = !player.hasReallyFinished() || isStillWatching
                                 }
                                 database.tvShowDao().update(updatedTvShow)
-                                CloudSyncHooks.tvShow(requireContext(), provider, updatedTvShow)
                             }
                         }
                     }
@@ -1118,11 +1115,6 @@ class PlayerMobileFragment : Fragment() {
                                                 isWatching = !player.hasReallyFinished() || isStillWatching
                                             }
                                             database.tvShowDao().update(updatedTvShow)
-                                            CloudSyncHooks.tvShow(
-                                                requireContext(),
-                                                provider,
-                                                updatedTvShow,
-                                            )
                                         }
                                     }
                                 }
@@ -1604,15 +1596,9 @@ class PlayerMobileFragment : Fragment() {
     }
 
     private fun buildSerienStreamBypassUrl(): String? {
-        val provider = UserPreferences.currentProvider ?: return null
-        if (provider != SerienStreamProvider) return null
-
-        val episodeId = when (val type = args.videoType) {
-            is Video.Type.Episode -> type.id
-            is Video.Type.Movie -> return null
-        }
-
-        return "${SerienStreamProvider.baseUrl}serie/$episodeId"
+        // Legacy s.to bypass: hardcoded providers are gone, extension links
+        // carry their own headers/cookies, so there is nothing to build.
+        return null
     }
 
     private fun applyBypassCookies(url: String, cookieHeader: String) {

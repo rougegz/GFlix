@@ -3,13 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_main_graph_mobile"
-    app:startDestination="@id/providers">
+    app:startDestination="@id/home">
 
     <fragment
         android:id="@+id/providers"
-        android:name="com.gflix.app.fragments.providers.ProvidersMobileFragment"
-        android:label="fragment_providers_mobile"
-        tools:layout="@layout/fragment_providers_mobile">
+        android:name="com.gflix.app.fragments.extensions.ExtBrowserMobileFragment"
+        android:label="fragment_extensions_mobile">
         <action
             android:id="@+id/action_providers_to_home"
             app:destination="@id/home" />

@@ -146,6 +146,17 @@ data class ExtLoadData(
     val plot: String? = null,
     val year: Int? = null,
     /** Opaque episode/season payload; extension resolves it in loadLinks. */
+    val dataUrl: String = "",
+    val episodes: List<ExtEpisode> = emptyList()
+)
+
+@Serializable
+data class ExtEpisode(
+    val id: String,
+    val name: String? = null,
+    val season: Int = 1,
+    val episode: Int = 0,
+    val posterUrl: String? = null,
     val dataUrl: String = ""
 )
 

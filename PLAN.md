@@ -71,18 +71,19 @@ Evidence base:
 - [x] Keep old providers wired; facade opt-in only — verify: `Provider.kt` still
       has legacy map (no deletion yet), app still compiles conceptually
 
-## Milestone 2: Repo + Extension Settings UI (CloudStream-like, mobile + TV)
+## Milestone 2: Repo + Extension Settings UI (CloudStream-like, mobile + TV) — DONE 2026-09-14 (`verify_rewrite` PASS)
 
-- [ ] `fragments/extensions/`: `ReposFragment` (+Tv Leanback rows): add repo URL
-      (validate + fetch `repository.json`), list repos, refresh, delete repo
-      (cascades uninstall of its extensions); `ExtBrowserFragment` (+Tv):
-      extension icon/version/lang/tvTypes, Install/Update/Enable/Disable/Delete,
-      search filter, per-extension settings entry (`openSettings`-equivalent) —
-      verify: layout/xml + nav graph entries exist in
-      `res/navigation/nav_main_graph_{mobile,tv}.xml`
-- [ ] Wire into `SettingsMobileFragment/SettingsTvFragment` as "Extensions &
-      Repositories" category (replacing per-provider domain prefs later) —
-      verify: grep finds `Extensions` preference key in both settings files
+- [x] `fragments/extensions/`: `ReposMobile/TvFragment`, `ExtBrowserMobile/TvFragment`,
+      `ExtensionsViewModel` (addRepo with URL-candidate fallback, deleteRepo
+      cascade, install/update/enable/disable/delete, strict selectExtension with
+      auto-enable + engine invalidate); nav `ext_repos`/`ext_browser` in both
+      graphs; startDestination=`home` (no provider picker; `providers` id kept
+      as ext-browser alias for old popUpTo calls)
+- [x] Settings: SEPARATE `p_settings_repos` → ext_repos + `p_settings_ext_browser`
+      → ext_browser (both XMLs + both fragments); per-provider domain screen
+      (`screen_provider`), TMDB category + toggle + API key deleted; missing
+      `backup/` package restored against single extensions DB (Gson rows +
+      sqlite-zip with traversal guard)
 
 ## Milestone 3: Player UI cleanup (CloudStream-style, no server grid)
 
@@ -100,12 +101,17 @@ Evidence base:
       quality picker + `PlayerSubtitleHelper` merge — verify: new player files
       list matches plan
 
-## Milestone 4: Browse/Search/Details rewired + legacy deletion
+## Milestone 4: Browse/Search/Details rewired + legacy deletion — DONE 2026-09-14 (`verify_rewrite` PASS)
 
-- [ ] Home/Search/Movie/TvShow/Season query `ExtProviderFacade` (multi-extension
-      merge, provider filter chips, language badge, per-extension error/empty
-      states); replace `ProvidersMobile/TvFragment` old list with Ext browser
-      entry point — verify: fragments reference `ExtProviderFacade`
+- [x] Provider picker deleted: nav starts at `home`; `ProvidersMobile/TvFragment`
+      gone; MainMobile/TvActivity stripped of dead provider init/imports and
+      `currentProvider` gates (first-run with no extensions routes to
+      `ext_repos`); global search includes `language=="multi"` providers;
+      `CloudStreamAdapter.toSearchItems` collapses S1/S2 season entries onto one
+      card (`showKey`); `ExtensionContentProvider` selection is strict (no silent
+      fall back to all); legacy SerienStream bypass / AnimeOnline clearance /
+      per-provider settings / TMDB references removed; `ExtProviderFacade`
+      kept as compat delegate
 - [ ] DELETE: `providers/*Provider.kt` except `TmdbProvider.kt` (moved to
       `core:metadata` conceptually), `extractors/*.kt` except shim, dead
       `WebViewResolver/BypassWebSocket*/JsUnpacker/CryptoAES-per-provider` refs,

@@ -11,7 +11,6 @@ import com.gflix.app.R
 import com.gflix.app.fragments.player.settings.PlayerSettingsView
 import com.gflix.app.providers.Provider
 import com.gflix.app.providers.Provider.Companion.providers
-import com.gflix.app.providers.TmdbProvider
 import androidx.core.content.edit
 import com.gflix.app.database.AppDatabase
 import org.json.JSONObject
@@ -63,24 +62,10 @@ object UserPreferences {
 
 
     var currentProvider: Provider?
-        get() {
-            val providerName = Key.CURRENT_PROVIDER.getString()
-            if (providerName?.startsWith("TMDb (") == true && providerName.endsWith(")")) {
-                val lang = providerName.substringAfter("TMDb (").substringBefore(")")
-                return TmdbProvider(lang)
-            }
-            return Provider.providers.keys.find { it.name == providerName }
-        }
+        get() = com.gflix.app.providers.ExtensionContentProvider
         set(value) {
-            // CRITICO: Resetta l'istanza del database prima di cambiare provider
-            // per forzare la creazione di un nuovo database file corretto.
             AppDatabase.resetInstance()
-
             Key.CURRENT_PROVIDER.setString(value?.name)
-            runCatching {
-                ArtworkRepairScheduler.schedule(GFlixApp.instance, value)
-            }
-            // Notify all ViewModels that the provider has changed
             ProviderChangeNotifier.notifyProviderChanged()
         }
 
@@ -190,24 +175,6 @@ object UserPreferences {
         get() = Key.SELECTED_THEME.getString() ?: "default"
         set(value) = Key.SELECTED_THEME.setString(value)
 
-    var tmdbApiKey: String
-        get() = Key.TMDB_API_KEY.getString() ?: ""
-        set(value) {
-            Key.TMDB_API_KEY.setString(value)
-            TMDb3.rebuildService()
-        }
-    var enableTmdb: Boolean
-        get() = Key.ENABLE_TMDB.getBoolean() ?: true
-        set(value) {
-            Key.ENABLE_TMDB.setBoolean(value)
-            TMDb3.rebuildService()
-            if (value) {
-                runCatching {
-                    ArtworkRepairScheduler.schedule(GFlixApp.instance, currentProvider)
-                }
-            }
-        }
-
     var parentalControlPin: String
         get() = Key.PARENTAL_CONTROL_PIN.getString() ?: ""
         set(value) {
@@ -245,7 +212,7 @@ object UserPreferences {
         }
 
     val isParentalControlActive: Boolean
-        get() = enableTmdb && parentalControlPin.isNotBlank() && parentalControlMaxAge != null
+        get() = parentalControlPin.isNotBlank() && parentalControlMaxAge != null
 
     val isParentalControlTemporarilyLocked: Boolean
         get() = parentalControlLockedUntilMillis > System.currentTimeMillis()

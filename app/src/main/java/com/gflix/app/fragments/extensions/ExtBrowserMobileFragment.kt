@@ -92,7 +92,15 @@ open class ExtBrowserMobileFragment : Fragment() {
             if (!isCurrent) {
                 row.addView(Button(ctx).apply {
                     text = "Use"
-                    setOnClickListener { viewModel.selectExtension(meta.internalName) }
+                    setOnClickListener {
+                        viewModel.selectExtension(meta.internalName) { ok ->
+                            toastResult(ok)
+                            if (ok) runCatching {
+                                androidx.navigation.fragment.findNavController(this@ExtBrowserMobileFragment)
+                                    .navigate(com.gflix.app.R.id.home)
+                            }
+                        }
+                    }
                 })
             }
             row.addView(Button(ctx).apply {

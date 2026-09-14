@@ -62,3 +62,40 @@ if errors:
         print(f" - {e}")
     sys.exit(1)
 print("PASS check_android_runtime: Dex loader + facade + extension UI present")
+
+# --- Regression gates for the provider-purge + extension-UX slice ---
+import re as _re
+NAV_FILES = ["app/src/main/res/navigation/nav_main_graph_mobile.xml",
+             "app/src/main/res/navigation/nav_main_graph_tv.xml"]
+for nav in NAV_FILES:
+    text = (ROOT / nav).read_text()
+    if 'startDestination="@id/providers"' in text:
+        errors.append(f"{nav} still starts at providers picker")
+    if "fragments.providers.Providers" in text:
+        errors.append(f"{nav} still references deleted Providers fragment")
+for xml in ["app/src/main/res/xml/settings_mobile.xml",
+            "app/src/main/res/xml/settings_tv.xml"]:
+    text = (ROOT / xml).read_text()
+    for key in ["p_settings_repos", "p_settings_ext_browser"]:
+        if key not in text:
+            errors.append(f"{xml} missing separate entry: {key}")
+    for dead in ['android:key="screen_provider"', 'android:key="pc_tmdb_settings"']:
+        if dead in text:
+            errors.append(f"{xml} still contains legacy {dead}")
+EXT_CORE = ROOT / "ext-core" / "src" / "main" / "kotlin" / "com" / "gflix" / "extcore"
+repo_mgr = (EXT_CORE / "RepoManager.kt").read_text()
+for sym in ["repoCandidates", "Tried:"]:
+    if sym not in repo_mgr:
+        errors.append(f"RepoManager.kt missing 404-fallback symbol: {sym}")
+adapter = (APP_EXT / "CloudStreamAdapter.kt").read_text()
+if "showKey" not in adapter or "distinctBy" not in adapter:
+    errors.append("CloudStreamAdapter.kt missing season dedupe (showKey/distinctBy)")
+facade = (APP_EXT / "ExtProviderFacade.kt").read_text()
+if "invalidateAll" not in (ROOT / "app" / "src" / "main" / "java" / "com" / "gflix" / "app" / "fragments" / "extensions" / "ExtensionsViewModel.kt").read_text():
+    errors.append("ExtensionsViewModel.selectExtension missing engine invalidate (stale APIs)")
+
+if errors:
+    print("FAIL check_android_runtime (regression gates)")
+    for e in errors:
+        print(f" - {e}")
+    sys.exit(1)

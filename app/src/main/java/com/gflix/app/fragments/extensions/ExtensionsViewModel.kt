@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.gflix.app.extensions.ExtDao
 import com.gflix.app.extensions.ExtDatabase
 import com.gflix.app.extensions.ExtEntity
+import com.gflix.app.extensions.ExtensionEngine
 import com.gflix.app.extensions.ExtensionActions
 import com.gflix.app.extensions.RepoDao
 import com.gflix.app.extensions.RepoEntity
@@ -134,7 +135,8 @@ class ExtensionsViewModel(application: Application) : AndroidViewModel(applicati
     fun deleteRepo(url: String) = viewModelScope.launch(Dispatchers.IO) {
         runCatching {
             val normalized = normalizeRepoUrl(url)
-            for (ext in extDao.listInstalled().filter { it.repoUrl == normalized }) {
+            val keys = (com.gflix.extcore.RepoManager.repoCandidates(normalized) + normalized).toSet()
+            for (ext in extDao.listInstalled().filter { it.repoUrl in keys }) {
                 actions.delete(
                     com.gflix.extcore.InstalledExtension(
                         meta = availableMeta(ext) ?: continueMeta(ext),
@@ -145,9 +147,11 @@ class ExtensionsViewModel(application: Application) : AndroidViewModel(applicati
                 )
                 extDao.deleteById(ext.internalName)
             }
-            extDao.deleteByRepo(normalized)
-            repoDao.deleteByUrl(normalized)
-            repoManager.removeRepo(normalized)
+            for (key in keys) {
+                extDao.deleteByRepo(key)
+                repoDao.deleteByUrl(key)
+                repoManager.removeRepo(key)
+            }
             if (_currentId.value.isNotBlank() && extDao.findById(_currentId.value) == null) {
                 selectExtension("")
             }
@@ -215,10 +219,25 @@ class ExtensionsViewModel(application: Application) : AndroidViewModel(applicati
         }.onFailure { _error.value = it.message }
     }
 
-    fun selectExtension(id: String) {
-        _currentId.value = id
-        UserPreferences.currentExtensionId = id
-    }
+    fun selectExtension(id: String, onDone: (Boolean) -> Unit = {}) =
+        viewModelScope.launch(Dispatchers.IO) {
+            var ok = false
+            runCatching {
+                if (id.isNotBlank()) {
+                    val ext = extDao.findById(id)
+                        ?: throw IllegalStateException("Extension not installed: $id")
+                    if (!ext.enabled) {
+                        extDao.upsert(ext.copy(enabled = true))
+                        _installed.value = extDao.listInstalled()
+                    }
+                }
+                _currentId.value = id
+                UserPreferences.currentExtensionId = id
+                ExtensionEngine.getInstance(getApplication()).invalidateAll()
+                ok = true
+            }.onFailure { _error.value = it.message }
+            onDone(ok)
+        }
 
     fun clearError() {
         _error.value = null

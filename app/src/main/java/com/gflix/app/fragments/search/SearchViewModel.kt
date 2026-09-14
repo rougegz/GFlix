@@ -158,7 +158,7 @@ class SearchViewModel(database: AppDatabase) : ViewModel() {
 
         val isCurrentProviderIptv = UserPreferences.currentProvider is IptvProvider
         val targetProviders = Provider.providers.keys
-            .filter { it.language == currentLanguage && (it is IptvProvider) == isCurrentProviderIptv }
+            .filter { (it.language == currentLanguage || it.language == "multi") && (it is IptvProvider) == isCurrentProviderIptv }
             .toList()
 
         if (targetProviders.isEmpty()) {

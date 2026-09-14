@@ -10,7 +10,6 @@ import com.gflix.app.models.Category
 import com.gflix.app.models.Episode
 import com.gflix.app.models.Movie
 import com.gflix.app.models.TvShow
-import com.gflix.app.providers.AnimeOnlineNinjaProvider
 import com.gflix.app.providers.Provider
 import com.gflix.app.ui.UserDataNotifier
 import com.gflix.app.utils.HomeCacheStore
@@ -368,7 +367,7 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
                         ?: season
                 }
 
-                val resolvedEpisode = if (UserPreferences.enableTmdb) {
+                val resolvedEpisode = run {
                     val seasonId = resolvedSeason?.id
                         ?: episode.season?.id
                     seasonId?.let { key ->
@@ -382,8 +381,6 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
                     }?.firstOrNull { seasonEpisode ->
                         seasonEpisode.id == episode.id || seasonEpisode.number == episode.number
                     }
-                } else {
-                    null
                 }
 
                 episode.copy(
@@ -409,10 +406,7 @@ class HomeViewModel(database: AppDatabase) : ViewModel() {
         currentProvider = provider
         val appContext = GFlixApp.instance.applicationContext
         val cachedCategories = HomeCacheStore.read(appContext, provider)
-        val deferCachedHomeForClearance =
-                provider === AnimeOnlineNinjaProvider &&
-                        !AnimeOnlineNinjaProvider.hasCurrentClearanceCookie()
-        if (!cachedCategories.isNullOrEmpty() && !deferCachedHomeForClearance) {
+        if (!cachedCategories.isNullOrEmpty()) {
             _state.emit(State.SuccessLoading(cachedCategories))
         } else {
             _state.emit(State.Loading)

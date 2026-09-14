@@ -1,115 +1,13494 @@
-package com.gflix.app.utils
-
-import com.gflix.app.adapters.AppAdapter
-import com.gflix.app.models.Category
-import com.gflix.app.models.Episode
-import com.gflix.app.models.Movie
-import com.gflix.app.models.Show
-import com.gflix.app.models.TvShow
-import com.gflix.app.providers.Provider
-import com.gflix.app.providers.TmdbProvider
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-
-object ParentalControlUtils {
-
-    suspend fun filterCategories(categories: List<Category>): List<Category> {
-        if (!UserPreferences.isParentalControlActive) return categories
-
-        return categories.mapNotNull { category ->
-            val filteredItems = filterItems(category.list)
-            if (filteredItems.isEmpty()) {
-                null
-            } else {
-                category.copy(list = filteredItems).also { filteredCategory ->
-                    filteredCategory.selectedIndex = category.selectedIndex
-                        .coerceAtMost(filteredItems.lastIndex.coerceAtLeast(0))
-                    filteredCategory.itemSpacing = category.itemSpacing
-                }
-            }
-        }
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
     }
-
-    suspend fun filterShows(shows: List<Show>): List<Show> {
-        return filterItems(shows)
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
     }
-
-    suspend fun <T : AppAdapter.Item> filterItems(items: List<T>): List<T> {
-        if (!UserPreferences.isParentalControlActive) return items
-
-        return coroutineScope {
-            val visibility = items.map { item ->
-                async { filterItem(item) != null }
-            }.awaitAll()
-
-            items.filterIndexed { index, _ -> visibility[index] }
-        }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
     }
-
-    private suspend fun filterItem(item: AppAdapter.Item): AppAdapter.Item? {
-        return when (item) {
-            is Movie -> item.takeIf { isAllowedMovie(it) }
-            is TvShow -> item.takeIf { isAllowedTvShow(it) }
-            is Episode -> item.takeIf { isAllowedEpisode(it) }
-            else -> item
-        }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
     }
-
-    private suspend fun isAllowedMovie(movie: Movie): Boolean {
-        val maxAge = UserPreferences.parentalControlMaxAge ?: return true
-        val ageRating = resolveMovieAgeRating(movie) ?: return false
-        return ageRating <= maxAge
+k    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
     }
-
-    private suspend fun isAllowedTvShow(tvShow: TvShow): Boolean {
-        val maxAge = UserPreferences.parentalControlMaxAge ?: return true
-        val ageRating = resolveTvShowAgeRating(tvShow) ?: return false
-        return ageRating <= maxAge
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
     }
-
-    private suspend fun isAllowedEpisode(episode: Episode): Boolean {
-        val tvShow = episode.tvShow ?: return false
-        return isAllowedTvShow(tvShow)
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
     }
-
-    private suspend fun resolveMovieAgeRating(movie: Movie): Int? {
-        val provider = resolveProvider(movie.providerName)
-        val providerLanguage = provider?.language ?: UserPreferences.currentProvider?.language
-        val isTmdbSource = provider is TmdbProvider || (movie.providerName.isNullOrBlank() && UserPreferences.currentProvider is TmdbProvider)
-
-        return when {
-            isTmdbSource ->
-                movie.id.toIntOrNull()?.let { TmdbUtils.getMovieAgeRatingById(it, providerLanguage) }
-                    ?: TmdbUtils.getMovieAgeRating(movie.title, extractYear(movie), providerLanguage)
-
-            else -> TmdbUtils.getMovieAgeRating(movie.title, extractYear(movie), providerLanguage)
-        }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
     }
-
-    private suspend fun resolveTvShowAgeRating(tvShow: TvShow): Int? {
-        val provider = resolveProvider(tvShow.providerName)
-        val providerLanguage = provider?.language ?: UserPreferences.currentProvider?.language
-        val isTmdbSource = provider is TmdbProvider || (tvShow.providerName.isNullOrBlank() && UserPreferences.currentProvider is TmdbProvider)
-
-        return when {
-            isTmdbSource ->
-                tvShow.id.toIntOrNull()?.let { TmdbUtils.getTvShowAgeRatingById(it, providerLanguage) }
-                    ?: TmdbUtils.getTvShowAgeRating(tvShow.title, extractYear(tvShow), providerLanguage)
-
-            else -> TmdbUtils.getTvShowAgeRating(tvShow.title, extractYear(tvShow), providerLanguage)
-        }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
     }
-
-    private fun extractYear(movie: Movie): Int? = movie.released?.get(java.util.Calendar.YEAR)
-
-    private fun extractYear(tvShow: TvShow): Int? = tvShow.released?.get(java.util.Calendar.YEAR)
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
 
     private fun resolveProvider(providerName: String?): Provider? {
         if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
-        if (providerName.startsWith("TMDb (") && providerName.endsWith(")")) {
-            return TmdbProvider(providerName.substringAfter("TMDb (").substringBefore(")"))
-        }
         return Provider.findByName(providerName)
     }
-}
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+C    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+E    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+M    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+T    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+P    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+k    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+k    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+k    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+b    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+j    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+P    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+C    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+U    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+C    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+L    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+<    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+C    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+>    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+L    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+<    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+C    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+>    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+!    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+U    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+P    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+P    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+C    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+N    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+N    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+-    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+>    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+=    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+E    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+=    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+C    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+-    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+>    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+C    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+=    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+M    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+L    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+0    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+C    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+=    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+L    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+<    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+>    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+L    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+<    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+>    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+<    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+T    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+>    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+L    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+<    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+T    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+>    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+L    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+<    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+T    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+>    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+!    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+U    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+P    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+P    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+C    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+b    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+=    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+-    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+>    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+!    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+=    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+,    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+_    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+-    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+>    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+b    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+[    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+]    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+?    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+M    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+-    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+>    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+k    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+M    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+T    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+-    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+>    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+k    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+T    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+E    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+-    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+>    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+k    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+E    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+-    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+>    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+M    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+M    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+B    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+=    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+U    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+P    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+C    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+M    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+?    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+R    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+=    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+M    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+R    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+?    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+R    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+<    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+=    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+T    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+T    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+B    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+=    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+U    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+P    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+C    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+M    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+?    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+R    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+=    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+T    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+R    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+?    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+R    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+<    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+=    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+E    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+E    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+B    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+=    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+?    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+T    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+M    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+R    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+M    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+?    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+=    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+T    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+R    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+T    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+?    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+=    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+Y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+M    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+?    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+=    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+?    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+j    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+C    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+Y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+E    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+R    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+x    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+Y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+T    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+I    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+?    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+=    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+w    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+?    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+j    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+C    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+Y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+E    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+R    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+P    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+N    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+S    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+?    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+:    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+P    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+?    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+N    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+N    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+O    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+B    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+l    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+k    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+U    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+P    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+c    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+P    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+N    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+W    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+"    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+T    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+M    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+D    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+b    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+"    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+&    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+&    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+N    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+W    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+h    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+"    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+"    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+{    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+T    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+b    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+P    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+N    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+b    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+A    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+"    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+T    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+M    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+D    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+b    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+"    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+b    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+s    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+g    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+B    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+"    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+"    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+t    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+u    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+P    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+.    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+f    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+n    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+B    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+y    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+N    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+(    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+p    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+o    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+v    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+i    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+d    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+r    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+N    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+a    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+m    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+e    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+)    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+     private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+}    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }
+
+    private fun resolveProvider(providerName: String?): Provider? {
+        if (providerName.isNullOrBlank()) return UserPreferences.currentProvider
+        return Provider.findByName(providerName)
+    }

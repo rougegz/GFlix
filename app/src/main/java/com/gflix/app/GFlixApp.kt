@@ -8,10 +8,6 @@ import android.os.Bundle
 import java.security.Security
 import org.conscrypt.Conscrypt
 import com.gflix.app.database.AppDatabase
-import com.gflix.app.providers.AniWorldProvider
-import com.gflix.app.providers.SerienStreamProvider
-import com.gflix.app.sync.CloudSyncManager
-import com.gflix.app.sync.SupabaseProvider
 import com.gflix.app.utils.AppLanguageManager
 import com.gflix.app.utils.ArtworkRepairScheduler
 import com.gflix.app.utils.CacheUtils
@@ -85,10 +81,6 @@ class GFlixApp : Application() {
 
         applicationScope.launch(Dispatchers.IO) {
             AppDatabase.setup(appContext)
-            SupabaseProvider.initialize(appContext)
-            runCatching { CloudSyncManager.initialize(appContext) }
-            SerienStreamProvider.initialize(appContext)
-            AniWorldProvider.initialize(appContext)
             ArtworkRepairScheduler.schedule(appContext, UserPreferences.currentProvider)
             CacheUtils.autoClearIfNeeded(appContext, thresholdMb = threshold)
         }

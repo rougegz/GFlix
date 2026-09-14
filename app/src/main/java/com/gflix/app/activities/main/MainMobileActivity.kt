@@ -29,19 +29,11 @@ import com.gflix.app.R
 import com.gflix.app.activities.tools.BypassWebViewActivity
 import com.gflix.app.databinding.ActivityMainMobileBinding
 import com.gflix.app.fragments.player.PlayerMobileFragment
-import com.gflix.app.providers.Cine24hProvider
-import com.gflix.app.providers.FilmyOnlineCcProvider
-import com.gflix.app.providers.GuardaSerieProvider
-import com.gflix.app.providers.IptvProvider
-import com.gflix.app.providers.Provider
-import com.gflix.app.providers.ZaluknijProvider
 import com.gflix.app.ui.UpdateAppMobileDialog
 import com.gflix.app.utils.AppLanguageManager
-import com.gflix.app.utils.ProviderChangeNotifier
 import com.gflix.app.utils.ThemeManager
 import com.gflix.app.utils.UserPreferences
 import com.gflix.app.utils.getCurrentFragment
-import com.gflix.app.providers.AnimeOnlineNinjaProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -104,12 +96,6 @@ class MainMobileActivity : FragmentActivity() {
 
         super.onCreate(savedInstanceState)
 
-        AnimeOnlineNinjaProvider.init(this)
-        Cine24hProvider.init(this)
-        FilmyOnlineCcProvider.init(this)
-        GuardaSerieProvider.init(this)
-        ZaluknijProvider.init(this)
-
         WindowCompat.setDecorFitsSystemWindows(window, false)
         val palette = ThemeManager.palette(UserPreferences.selectedTheme)
         window.statusBarColor = palette.systemBar
@@ -151,17 +137,18 @@ class MainMobileActivity : FragmentActivity() {
         }
 
         if (savedInstanceState == null) {
-            UserPreferences.currentProvider?.let {
-                navController.navigate(
-                    R.id.home,
-                    null,
-                    navOptions {
-                        launchSingleTop = true
-                        popUpTo(R.id.providers) {
-                            inclusive = true
+            val hasExt = UserPreferences.useExtensions ||
+                UserPreferences.currentExtensionId.isNotBlank()
+            if (!hasExt) {
+                runCatching {
+                    navController.navigate(
+                        R.id.ext_repos,
+                        null,
+                        navOptions {
+                            launchSingleTop = true
                         }
-                    }
-                )
+                    )
+                }
             }
         }
 
@@ -180,14 +167,6 @@ class MainMobileActivity : FragmentActivity() {
             updateNavigationVisibility(destination.id)
             updateBottomNavigationVisibility(destination.id)
             binding.mainContent.post { binding.mainContent.requestApplyInsets() }
-        }
-
-        lifecycleScope.launch {
-            ProviderChangeNotifier.providerChangeFlow
-                .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
-                .collect {
-                    updateNavigationVisibility(navController.currentDestination?.id)
-                }
         }
 
         lifecycleScope.launch {
@@ -231,14 +210,12 @@ class MainMobileActivity : FragmentActivity() {
                     return
                 }
 
-                if (UserPreferences.currentProvider != null && currentDestinationId == R.id.home) {
+                if (currentDestinationId == R.id.home) {
                     closeTask()
                     return
                 }
 
-                if (UserPreferences.currentProvider != null &&
-                    isTopLevelProviderDestination(currentDestinationId)
-                ) {
+                if (isTopLevelProviderDestination(currentDestinationId)) {
                     navigateToProviderHome(navController)
                     return
                 }
@@ -289,42 +266,19 @@ class MainMobileActivity : FragmentActivity() {
     }
 
     private fun updateBottomNavigationVisibility(destinationId: Int?) {
-        val showBottomNav =
-            UserPreferences.currentProvider != null && isTopLevelProviderDestination(destinationId)
+        val showBottomNav = isTopLevelProviderDestination(destinationId)
         binding.bnvMain.visibility = if (showBottomNav) View.VISIBLE else View.GONE
         binding.btnMainSearch.visibility = if (
-            UserPreferences.currentProvider != null &&
             isTopLevelProviderDestination(destinationId) &&
             destinationId != R.id.search
         ) View.VISIBLE else View.GONE
     }
 
     private fun updateNavigationVisibility(currentDestinationId: Int? = null) {
-        val provider = UserPreferences.currentProvider ?: return
-        val supportsMovies = Provider.supportsMovies(provider)
-        val supportsTvShows = Provider.supportsTvShows(provider)
-
-        binding.bnvMain.menu.findItem(R.id.movies)?.isVisible = supportsMovies
-        binding.bnvMain.menu.findItem(R.id.tv_shows)?.apply {
-            isVisible = supportsTvShows
-            title = if (provider is IptvProvider) {
-                getString(R.string.main_menu_all_channels)
-            } else {
-                getString(R.string.main_menu_tv_shows)
-            }
-        }
-
-        val navHost =
-            supportFragmentManager.findFragmentById(R.id.nav_main_fragment) as? NavHostFragment
-        val navController = navHost?.navController ?: return
-        when {
-            currentDestinationId == R.id.movies && !supportsMovies -> {
-                navController.navigate(R.id.tv_shows)
-            }
-
-            currentDestinationId == R.id.tv_shows && !supportsTvShows -> {
-                navController.navigate(R.id.home)
-            }
+        if (currentDestinationId == R.id.movies || currentDestinationId == R.id.tv_shows) {
+            val navHost =
+                supportFragmentManager.findFragmentById(R.id.nav_main_fragment) as? NavHostFragment
+            navHost?.navController?.navigate(R.id.home)
         }
     }
 
@@ -332,8 +286,6 @@ class MainMobileActivity : FragmentActivity() {
         return destinationId in setOf(
             R.id.search,
             R.id.home,
-            R.id.movies,
-            R.id.tv_shows,
             R.id.favorites,
             R.id.settings,
         )

@@ -59,7 +59,17 @@ class CsPluginApi(
             posterUrl = strProp(raw, "posterUrl", "poster").ifBlank { null },
             plot = strProp(raw, "plot", "overview", "description").ifBlank { null },
             year = intProp(raw, "year").takeIf { it > 0 },
-            dataUrl = strProp(raw, "dataUrl", "url").ifBlank { id }
+            dataUrl = strProp(raw, "dataUrl", "url").ifBlank { id },
+            episodes = listProp(raw, "episodes").filterNotNull().map { ep ->
+                ExtEpisode(
+                    id = strProp(ep, "url", "id", "data").ifBlank { id },
+                    name = strProp(ep, "name", "title").ifBlank { null },
+                    season = intProp(ep, "season").takeIf { it > 0 } ?: 1,
+                    episode = intProp(ep, "episode", "number", "position"),
+                    posterUrl = strProp(ep, "posterUrl", "poster", "thumbUrl").ifBlank { null },
+                    dataUrl = strProp(ep, "data", "url").ifBlank { id }
+                )
+            }
         )
     }.getOrDefault(ExtLoadData(id, id))
 

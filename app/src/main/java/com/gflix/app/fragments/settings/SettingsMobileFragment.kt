@@ -32,18 +32,10 @@ import com.gflix.app.BuildConfig
 import com.gflix.app.R
 import com.gflix.app.activities.main.MainMobileActivity
 import com.gflix.app.activities.tools.QrScannerActivity
+import com.gflix.app.database.AppDatabase
 import com.gflix.app.backup.BackupRestoreManager
 import com.gflix.app.backup.ProviderBackupContext
-import com.gflix.app.database.AppDatabase
-import com.gflix.app.providers.AnimeOnlineNinjaProvider
-import com.gflix.app.providers.FrenchStreamProvider
-import com.gflix.app.providers.Provider
-import com.gflix.app.providers.ProviderConfigUrl
-import com.gflix.app.providers.ProviderPortalUrl
-import com.gflix.app.providers.MStreamProvider
-import com.gflix.app.providers.SerienStreamProvider
-import com.gflix.app.providers.StreamingCommunityProvider
-import com.gflix.app.providers.TmdbProvider
+import com.gflix.app.providers.ExtensionContentProvider
 import com.gflix.app.utils.AppLanguageManager
 import com.gflix.app.utils.DnsResolver
 import com.gflix.app.utils.ProviderChangeNotifier
@@ -64,12 +56,6 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
         val title: String?,
     )
 
-    private val DEFAULT_DOMAIN_VALUE = "streamingunity.cc"
-    private val DEFAULT_SERIENSTREAM_DOMAIN_VALUE = "serienstream.to"
-    private val DEFAULT_MOFLIX_DOMAIN_VALUE = "moflix-stream.xyz"
-    private val DEFAULT_CUEVANA_DOMAIN_VALUE = "cuevana3.la"
-    private val DEFAULT_POSEIDON_DOMAIN_VALUE = "www.poseidonhd2.co"
-    private val PREFS_ERROR_VALUE = "PREFS_NOT_INIT_ERROR"
     private var currentScreenState = SettingsScreenState(rootKey = null, title = null)
     private val screenBackStack = ArrayDeque<SettingsScreenState>()
     private lateinit var settingsBackCallback: OnBackPressedCallback
@@ -150,30 +136,19 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
         currentScreenState = SettingsScreenState(rootKey = rootKey, title = null)
         renderCurrentScreen()
 
-        val allProvidersToBackup = Provider.providers.keys.toMutableList().apply {
-            listOf("it", "en", "es", "de", "fr").forEach { lang ->
-                add(TmdbProvider(lang))
-            }
-        }
-
+        val extDb = AppDatabase.getInstance(requireContext())
         backupRestoreManager = BackupRestoreManager(
             requireContext(),
-            allProvidersToBackup.mapNotNull { provider ->
-                try {
-                    val db = AppDatabase.getInstanceForProvider(provider.name, requireContext())
-                    ProviderBackupContext(
-                        name = provider.name,
-                        movieDao = db.movieDao(),
-                        tvShowDao = db.tvShowDao(),
-                        episodeDao = db.episodeDao(),
-                        seasonDao = db.seasonDao(),
-                        provider = provider
-                    )
-                } catch (e: Exception) {
-                    Log.w("BackupRestore", "Skipping ${provider.name}: ${e.message}")
-                    null
-                }
-            }
+            listOf(
+                ProviderBackupContext(
+                    name = ExtensionContentProvider.name,
+                    movieDao = extDb.movieDao(),
+                    tvShowDao = extDb.tvShowDao(),
+                    episodeDao = extDb.episodeDao(),
+                    seasonDao = extDb.seasonDao(),
+                    provider = ExtensionContentProvider
+                )
+            )
         )
 
         displaySettings()
@@ -232,195 +207,6 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
 
     private fun displaySettings() {
         updateOverviewLabels()
-        updateProviderVisibilityState()
-        SupabaseSettingsController.bind(this, lifecycleScope) { key ->
-            findPreference(key)
-        }
-
-        findPreference<EditTextPreference>("provider_streamingcommunity_domain")?.apply {
-            val currentValue = UserPreferences.streamingcommunityDomain
-            summary = currentValue
-            if (currentValue == DEFAULT_DOMAIN_VALUE || currentValue == PREFS_ERROR_VALUE) {
-                text = null
-            } else {
-                text = currentValue
-            }
-            setOnPreferenceChangeListener { preference, newValue ->
-                val typed = (newValue as String).trim()
-                val BLOCKED = listOf("streamingcommunityz.green", "streamingunity.club", "streamingunity.bike", "streamingcommunityz.buzz")
-                val effectiveDomain = if (BLOCKED.any { typed.contains(it) }) DEFAULT_DOMAIN_VALUE else typed
-                UserPreferences.streamingcommunityDomain = effectiveDomain
-                preference.summary = effectiveDomain
-                if (effectiveDomain != typed) {
-                    findPreference<EditTextPreference>("provider_streamingcommunity_domain")?.text = null
-                    Toast.makeText(requireContext(), getString(R.string.settings_streamingcommunity_domain_blocked), Toast.LENGTH_LONG).show()
-                }
-                if (UserPreferences.currentProvider is StreamingCommunityProvider) {
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        (UserPreferences.currentProvider as StreamingCommunityProvider).rebuildService()
-                        requireActivity().apply {
-                            finish()
-                            startActivity(Intent(this, this::class.java))
-                        }
-                    }
-                }
-                true
-            }
-        }
-
-        findPreference<Preference>("provider_streamingcommunity_domain_reset")?.setOnPreferenceClickListener {
-            UserPreferences.streamingcommunityDomain = DEFAULT_DOMAIN_VALUE
-            findPreference<EditTextPreference>("provider_streamingcommunity_domain")?.apply {
-                summary = DEFAULT_DOMAIN_VALUE
-                text = null
-            }
-            Toast.makeText(requireContext(), getString(R.string.settings_streamingcommunity_domain_reset_done), Toast.LENGTH_SHORT).show()
-            if (UserPreferences.currentProvider is StreamingCommunityProvider) {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    (UserPreferences.currentProvider as StreamingCommunityProvider).rebuildService()
-                    requireActivity().apply {
-                        finish()
-                        startActivity(Intent(this, this::class.java))
-                    }
-                }
-            }
-            true
-        }
-
-        findPreference<EditTextPreference>("provider_serienstream_domain")?.apply {
-            val currentValue = UserPreferences.serienstreamDomain
-            summary = currentValue
-            if (currentValue == DEFAULT_SERIENSTREAM_DOMAIN_VALUE || currentValue == PREFS_ERROR_VALUE) {
-                text = null
-            } else {
-                text = currentValue
-            }
-            setOnPreferenceChangeListener { preference, newValue ->
-                val typed = (newValue as String).trim()
-                val effectiveDomain = typed.ifBlank { DEFAULT_SERIENSTREAM_DOMAIN_VALUE }
-                UserPreferences.serienstreamDomain = effectiveDomain
-                preference.summary = effectiveDomain
-                if (UserPreferences.currentProvider is SerienStreamProvider) {
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        SerienStreamProvider.reloadService()
-                        requireActivity().apply {
-                            finish()
-                            startActivity(Intent(this, this::class.java))
-                        }
-                    }
-                }
-                true
-            }
-        }
-
-        findPreference<Preference>("provider_serienstream_domain_reset")?.setOnPreferenceClickListener {
-            UserPreferences.serienstreamDomain = DEFAULT_SERIENSTREAM_DOMAIN_VALUE
-            findPreference<EditTextPreference>("provider_serienstream_domain")?.apply {
-                summary = DEFAULT_SERIENSTREAM_DOMAIN_VALUE
-                text = null
-            }
-            Toast.makeText(requireContext(), getString(R.string.settings_serienstream_domain_reset_done), Toast.LENGTH_SHORT).show()
-            if (UserPreferences.currentProvider is SerienStreamProvider) {
-                viewLifecycleOwner.lifecycleScope.launch {
-                    SerienStreamProvider.reloadService()
-                    requireActivity().apply {
-                        finish()
-                        startActivity(Intent(this, this::class.java))
-                    }
-                }
-            }
-            true
-        }
-
-        findPreference<EditTextPreference>("provider_moflix_domain")?.apply {
-            val currentValue = UserPreferences.moflixDomain
-            summary = currentValue
-            if (currentValue == DEFAULT_MOFLIX_DOMAIN_VALUE || currentValue == PREFS_ERROR_VALUE) {
-                text = null
-            } else {
-                text = currentValue
-            }
-            setOnPreferenceChangeListener { preference, newValue ->
-                val typed = (newValue as String).trim()
-                val effectiveDomain = typed.ifBlank { DEFAULT_MOFLIX_DOMAIN_VALUE }
-                UserPreferences.moflixDomain = effectiveDomain
-                preference.summary = effectiveDomain
-                true
-            }
-        }
-
-        findPreference<Preference>("provider_moflix_domain_reset")?.setOnPreferenceClickListener {
-            UserPreferences.moflixDomain = DEFAULT_MOFLIX_DOMAIN_VALUE
-            findPreference<EditTextPreference>("provider_moflix_domain")?.apply {
-                summary = DEFAULT_MOFLIX_DOMAIN_VALUE
-                text = null
-            }
-            Toast.makeText(requireContext(), getString(R.string.settings_moflix_domain_reset_done), Toast.LENGTH_SHORT).show()
-            true
-        }
-
-        findPreference<EditTextPreference>("provider_cuevana_domain")?.apply {
-            val currentValue = UserPreferences.cuevanaDomain
-            summary = currentValue
-            if (currentValue == DEFAULT_CUEVANA_DOMAIN_VALUE) {
-                text = null
-            } else {
-                text = currentValue
-            }
-            setOnPreferenceChangeListener { preference, newValue ->
-                val newDomainFromDialog = newValue as String
-                UserPreferences.cuevanaDomain = newDomainFromDialog
-                preference.summary = UserPreferences.cuevanaDomain
-                if (UserPreferences.currentProvider?.name == "Cuevana 3") {
-                    requireActivity().apply {
-                        finish()
-                        startActivity(Intent(this, this::class.java))
-                    }
-                }
-                true
-            }
-        }
-
-        findPreference<EditTextPreference>("provider_poseidon_domain")?.apply {
-            val currentValue = UserPreferences.poseidonDomain
-            summary = currentValue
-            if (currentValue == DEFAULT_POSEIDON_DOMAIN_VALUE) {
-                text = null
-            } else {
-                text = currentValue
-            }
-            setOnPreferenceChangeListener { preference, newValue ->
-                val newDomainFromDialog = newValue as String
-                UserPreferences.poseidonDomain = newDomainFromDialog
-                preference.summary = UserPreferences.poseidonDomain
-                if (UserPreferences.currentProvider?.name == "Poseidonhd2") {
-                    requireActivity().apply {
-                        finish()
-                        startActivity(Intent(this, this::class.java))
-                    }
-                }
-                true
-            }
-        }
-
-        bindAnimeOnlineNinjaPreferredServer()
-
-        findPreference<EditTextPreference>("TMDB_API_KEY")?.apply {
-            summary = if (UserPreferences.tmdbApiKey.isEmpty()) getString(R.string.settings_tmdb_api_key_summary) else UserPreferences.tmdbApiKey
-            text = UserPreferences.tmdbApiKey
-            setOnPreferenceChangeListener { _, newValue ->
-                val newKey = (newValue as String).trim()
-                UserPreferences.tmdbApiKey = newKey
-                summary = if (newKey.isEmpty()) getString(R.string.settings_tmdb_api_key_summary) else newKey
-                val message = if (newKey.isEmpty()) {
-                    getString(R.string.settings_tmdb_api_key_reset)
-                } else {
-                    getString(R.string.settings_tmdb_api_key_success)
-                }
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-                true
-            }
-        }
 
         findPreference<EditTextPreference>("SUBDL_API_KEY")?.apply {
             summary = if (UserPreferences.subdlApiKey.isEmpty()) getString(R.string.settings_subdl_api_key_summary) else UserPreferences.subdlApiKey
@@ -455,8 +241,13 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
             setOnPreferenceClickListener(null)
         }
 
-        findPreference<Preference>("p_settings_extensions")?.setOnPreferenceClickListener {
+        findPreference<Preference>("p_settings_repos")?.setOnPreferenceClickListener {
             findNavController().navigate(com.gflix.app.R.id.ext_repos)
+            true
+        }
+
+        findPreference<Preference>("p_settings_ext_browser")?.setOnPreferenceClickListener {
+            findNavController().navigate(com.gflix.app.R.id.ext_browser)
             true
         }
 
@@ -562,119 +353,6 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
             }
         }
 
-        val HasConfigProvider = UserPreferences.currentProvider is ProviderConfigUrl
-        findPreference<PreferenceCategory>("pc_provider_settings")?.apply {
-            isVisible = HasConfigProvider
-        }
-
-        if (HasConfigProvider) {
-            val provider = UserPreferences.currentProvider
-            val configProvider = provider as? ProviderConfigUrl
-            val portalProvider = provider as? ProviderPortalUrl
-            var autoUpdateVal = false
-
-            findPreference<SwitchPreference>("provider_autoupdate")?.apply {
-                isVisible = portalProvider != null
-                if (isVisible) {
-                    autoUpdateVal = UserPreferences
-                        .getProviderCache(
-                            provider!!, UserPreferences
-                                .PROVIDER_AUTOUPDATE
-                        ) != "false"
-                    isChecked = autoUpdateVal
-                    setOnPreferenceChangeListener { _, newValue ->
-                        val newState = newValue as Boolean
-                        UserPreferences.setProviderCache(
-                            null,
-                            UserPreferences.PROVIDER_AUTOUPDATE,
-                            newState.toString()
-                        )
-                        findPreference<EditTextPreference>("provider_url")?.isEnabled = newState == false
-                        true
-                    }
-                }
-            }
-
-            findPreference<EditTextPreference>("provider_url")?.apply {
-                isVisible = configProvider != null
-                isEnabled = autoUpdateVal == false
-                if (isVisible && provider != null && configProvider != null) {
-                    summary = UserPreferences
-                        .getProviderCache(
-                            provider, UserPreferences
-                                .PROVIDER_URL
-                        )
-                        .ifBlank { provider.defaultBaseUrl }
-                    setOnBindEditTextListener { editText ->
-                        editText.inputType = InputType.TYPE_CLASS_TEXT
-                        editText.imeOptions = EditorInfo.IME_ACTION_DONE
-                        editText.hint = configProvider.defaultBaseUrl
-
-                        editText.setText(summary)
-                    }
-                    setOnPreferenceChangeListener { _, newValue ->
-                        val toSave = (newValue as String)
-                            .ifBlank { configProvider.defaultBaseUrl }
-                            .trim()
-                            .removeSuffix("/") + "/"
-                        UserPreferences.setProviderCache(
-                            null,
-                            UserPreferences.PROVIDER_URL,
-                            toSave
-                        )
-                        summary = toSave
-                        viewLifecycleOwner.lifecycleScope.launch {
-                            configProvider.onChangeUrl()
-                            ProviderChangeNotifier.notifyProviderChanged()
-                        }
-                        true
-                    }
-                }
-            }
-
-            findPreference<EditTextPreference>("provider_portal_url")?.apply {
-                isVisible = portalProvider != null
-                if (isVisible && provider != null && portalProvider != null) {
-                    summary = UserPreferences
-                        .getProviderCache(
-                            provider, UserPreferences
-                                .PROVIDER_PORTAL_URL
-                        )
-                        .ifBlank { portalProvider.defaultPortalUrl }
-                    setOnBindEditTextListener { editText ->
-                        editText.inputType = InputType.TYPE_CLASS_TEXT
-                        editText.imeOptions = EditorInfo.IME_ACTION_DONE
-                        editText.hint = portalProvider.defaultPortalUrl
-                        editText.setText(summary)
-                    }
-                    setOnPreferenceChangeListener { _, newValue ->
-                        val toSave = (newValue as String)
-                            .ifBlank { portalProvider.defaultPortalUrl }
-                            .trim()
-                            .removeSuffix("/") + "/"
-                        summary = toSave
-                        UserPreferences.setProviderCache(
-                            null,
-                            UserPreferences.PROVIDER_PORTAL_URL,
-                            toSave
-                        )
-                        true
-                    }
-                }
-            }
-
-            findPreference<Preference>("provider_autoupdate_now")?.apply {
-                isVisible = portalProvider != null
-                setOnPreferenceClickListener {
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        findPreference<EditTextPreference>("provider_url")?.summary =
-                            configProvider!!.onChangeUrl(true)
-                    }
-                    true
-                }
-            }
-        }
-
         findPreference<ListPreference>("p_doh_provider_url")?.apply {
             value = UserPreferences.dohProviderUrl
             summary = entry
@@ -690,39 +368,8 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
                         preference.summary = null
                     }
                 }
-                if (UserPreferences.currentProvider is StreamingCommunityProvider) {
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        (UserPreferences.currentProvider as StreamingCommunityProvider).rebuildService()
-                        requireActivity().apply {
-                            finish()
-                            startActivity(Intent(this, this::class.java))
-                        }
-                    }
-                } else {
-                    Toast.makeText(requireContext(), getString(R.string.doh_provider_updated), Toast.LENGTH_LONG).show()
-                }
+                Toast.makeText(requireContext(), getString(R.string.doh_provider_updated), Toast.LENGTH_LONG).show()
                 true
-            }
-        }
-
-        findPreference<SwitchPreference>("pc_frenchstream_new_interface")?.apply {
-            isVisible = UserPreferences.currentProvider is FrenchStreamProvider
-            if (isVisible) {
-                val useNewInterface = UserPreferences
-                    .getProviderCache(
-                        UserPreferences.currentProvider!!, UserPreferences
-                            .PROVIDER_NEW_INTERFACE
-                    ) != "false"
-                isChecked = useNewInterface
-                setOnPreferenceChangeListener { _, newValue ->
-                    val newState = newValue as Boolean
-                    UserPreferences.setProviderCache(
-                        null,
-                        UserPreferences.PROVIDER_NEW_INTERFACE,
-                        newState.toString()
-                    )
-                    true
-                }
             }
         }
 
@@ -776,32 +423,6 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
                 UserPreferences.immersiveMode = newValue as Boolean
                 (activity as? MainMobileActivity)?.updateImmersiveMode()
                 true
-            }
-        }
-
-        findPreference<SwitchPreferenceCompat>("ENABLE_TMDB")?.apply {
-            isChecked = UserPreferences.enableTmdb
-            setOnPreferenceChangeListener { _, newValue ->
-                val enabled = newValue as Boolean
-                val applyChange = {
-                    UserPreferences.enableTmdb = enabled
-                    updateParentalControlPreferenceState()
-                    ProviderChangeNotifier.notifyProviderChanged()
-                    val message = if (enabled) {
-                        getString(R.string.settings_enable_tmdb_enabled)
-                    } else {
-                        getString(R.string.settings_enable_tmdb_disabled)
-                    }
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-                }
-
-                if (!enabled && UserPreferences.parentalControlPin.isNotBlank()) {
-                    changeParentalSettingWithPinCheck(onVerified = applyChange)
-                    false
-                } else {
-                    applyChange()
-                    true
-                }
             }
         }
 
@@ -865,65 +486,12 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
     }
 
     private fun updateOverviewLabels() {
-        val providerName = UserPreferences.currentProvider?.name
-
-        findPreference<PreferenceScreen>("screen_provider")?.apply {
-            title = getString(R.string.settings_provider_connection_title)
-            summary = providerName?.let {
-                getString(R.string.settings_screen_provider_summary_with_name, it)
-            } ?: getString(R.string.settings_screen_provider_summary)
+        findPreference<Preference>("p_settings_repos")?.apply {
+            summary = getString(R.string.ext_repos_summary)
         }
-
-        findPreference<PreferenceCategory>("pc_provider_settings")?.title = providerName?.let {
-            getString(R.string.settings_provider_connection_category_title, it)
-        } ?: getString(R.string.settings_category_provider_title)
-
-        findPreference<PreferenceCategory>("pc_provider_empty_state")?.title = providerName?.let {
-            getString(R.string.settings_provider_connection_category_title, it)
-        } ?: getString(R.string.settings_provider_connection_title)
-    }
-
-    private fun updateProviderVisibilityState() {
-        val isStreamingCommunity = UserPreferences.currentProvider is StreamingCommunityProvider
-        val isSerienStream = UserPreferences.currentProvider is SerienStreamProvider
-        val isMoflix = UserPreferences.currentProvider is MStreamProvider
-        val isCuevana = UserPreferences.currentProvider?.name == "Cuevana 3"
-        val isPoseidon = UserPreferences.currentProvider?.name == "Poseidonhd2"
-        val isAnimeOnlineNinja = UserPreferences.currentProvider is AnimeOnlineNinjaProvider
-        val hasConfigProvider = UserPreferences.currentProvider is ProviderConfigUrl
-        val hasSpecificOptions = isStreamingCommunity || isCuevana || isPoseidon || isAnimeOnlineNinja
-
-        findPreference<PreferenceCategory>("pc_streamingcommunity_settings")?.isVisible = isStreamingCommunity
-        findPreference<PreferenceCategory>("pc_serienstream_settings")?.isVisible = isSerienStream
-        findPreference<PreferenceCategory>("pc_moflix_settings")?.isVisible = isMoflix
-        findPreference<PreferenceCategory>("pc_cuevana_settings")?.isVisible = isCuevana
-        findPreference<PreferenceCategory>("pc_poseidon_settings")?.isVisible = isPoseidon
-        findPreference<PreferenceCategory>("pc_animeonlineninja_settings")?.isVisible = isAnimeOnlineNinja
-        findPreference<PreferenceCategory>("pc_provider_empty_state")?.isVisible = !hasConfigProvider && !hasSpecificOptions
-    }
-
-    private fun bindAnimeOnlineNinjaPreferredServer() {
-        val preference = findPreference<ListPreference>("provider_animeonlineninja_preferred_server") ?: return
-        val currentValue = UserPreferences.getProviderCache(
-            AnimeOnlineNinjaProvider,
-            UserPreferences.PROVIDER_PREFERRED_SERVER
-        )
-        preference.value = currentValue
-        preference.summary = preference.entries
-            ?.getOrNull(preference.findIndexOfValue(currentValue))
-            ?: getString(R.string.settings_provider_animeonlineninja_preferred_server_summary)
-        preference.setOnPreferenceChangeListener { pref, newValue ->
-            val value = (newValue as String).trim()
-            UserPreferences.setProviderCache(
-                AnimeOnlineNinjaProvider,
-                UserPreferences.PROVIDER_PREFERRED_SERVER,
-                value
-            )
-            if (pref is ListPreference) {
-                pref.summary = pref.entries?.getOrNull(pref.findIndexOfValue(value))
-                    ?: getString(R.string.settings_provider_animeonlineninja_preferred_server_summary)
-            }
-            true
+        findPreference<Preference>("p_settings_ext_browser")?.apply {
+            val current = UserPreferences.currentExtensionId
+            summary = current.ifBlank { getString(R.string.ext_browser_summary) }
         }
     }
 
@@ -1472,22 +1040,6 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
         super.onResume()
         applyScreenTitle()
         updateOverviewLabels()
-        updateProviderVisibilityState()
-
-        findPreference<EditTextPreference>("provider_streamingcommunity_domain")?.apply {
-            val currentValue = UserPreferences.streamingcommunityDomain
-            summary = currentValue
-            if (currentValue == DEFAULT_DOMAIN_VALUE || currentValue == PREFS_ERROR_VALUE) {
-                text = null
-            } else {
-                text = currentValue
-            }
-        }
-
-        findPreference<EditTextPreference>("TMDB_API_KEY")?.apply {
-            summary = if (UserPreferences.tmdbApiKey.isEmpty()) getString(R.string.settings_tmdb_api_key_summary) else UserPreferences.tmdbApiKey
-            text = UserPreferences.tmdbApiKey
-        }
 
         findPreference<EditTextPreference>("SUBDL_API_KEY")?.apply {
             summary = if (UserPreferences.subdlApiKey.isEmpty()) getString(R.string.settings_subdl_api_key_summary) else UserPreferences.subdlApiKey
@@ -1505,7 +1057,6 @@ class SettingsMobileFragment : PreferenceFragmentCompat() {
         findPreference<SwitchPreference>("FORCE_EXTRA_BUFFERING")?.isChecked = UserPreferences.forceExtraBuffering
         findPreference<SwitchPreference>("PLAYER_GESTURES")?.isChecked = UserPreferences.playerGestures
         findPreference<SwitchPreference>("KEEP_SCREEN_ON_WHEN_PAUSED")?.isChecked = UserPreferences.keepScreenOnWhenPaused
-        findPreference<SwitchPreferenceCompat>("ENABLE_TMDB")?.isChecked = UserPreferences.enableTmdb
         updateParentalControlPreferenceState()
     }
 }

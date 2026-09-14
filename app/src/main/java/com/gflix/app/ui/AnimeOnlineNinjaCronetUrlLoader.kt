@@ -12,7 +12,6 @@ import com.bumptech.glide.load.model.MultiModelLoaderFactory
 import com.bumptech.glide.integration.okhttp3.OkHttpUrlLoader
 import com.bumptech.glide.signature.ObjectKey
 import com.gflix.app.utils.AnimeOnlineNinjaCronetClient
-import com.gflix.app.providers.AnimeOnlineNinjaProvider
 import com.gflix.app.utils.ArtworkRequestHeaders
 import com.gflix.app.utils.NetworkClient
 import java.io.ByteArrayInputStream
@@ -29,8 +28,12 @@ class AnimeOnlineNinjaCronetUrlLoader(
 
     private fun isAnimeOnlineNinja(model: GlideUrl): Boolean {
         return runCatching {
-            URI(model.toStringUrl()).host.equals(AnimeOnlineNinjaProvider.cronetHost, ignoreCase = true)
+            URI(model.toStringUrl()).host.equals(CRONET_HOST, ignoreCase = true)
         }.getOrDefault(false)
+    }
+
+    companion object {
+        private const val CRONET_HOST = "ww3.animeonline.ninja"
     }
 
     override fun handles(model: GlideUrl): Boolean = true
@@ -76,9 +79,7 @@ class AnimeOnlineNinjaCronetUrlLoader(
                 putAll(ArtworkRequestHeaders.headersFor(parsed))
                 putIfAbsent("User-Agent", NetworkClient.USER_AGENT)
                 putIfAbsent("Accept", "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8")
-                AnimeOnlineNinjaProvider.clearanceCookieForCronet()
-                    ?.takeIf { it.isNotBlank() }
-                    ?.let { put("Cookie", it) }
+
             }
 
             call = AnimeOnlineNinjaCronetClient.get(context, requestUrl, headers) { result ->

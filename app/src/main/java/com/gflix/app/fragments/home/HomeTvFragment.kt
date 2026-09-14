@@ -33,7 +33,7 @@ import androidx.navigation.fragment.findNavController
 import com.gflix.app.utils.UserPreferences
 import com.gflix.app.utils.ProviderChangeNotifier
 
-class HomeTvFragment : Fragment() {
+open class HomeTvFragment : Fragment() {
 
     private var hasAutoCleared409: Boolean = false
 

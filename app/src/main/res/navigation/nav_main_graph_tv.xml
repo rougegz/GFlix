@@ -76,7 +76,7 @@
     </fragment>
     <fragment
         android:id="@+id/movies"
-        android:name="com.gflix.app.fragments.home.HomeTvFragment"
+        android:name="com.gflix.app.fragments.movies.MoviesTvFragment"
         android:label="fragment_movies_tv"
         tools:layout="@layout/fragment_home_tv">
         <action
@@ -85,7 +85,7 @@
     </fragment>
     <fragment
         android:id="@+id/tv_shows"
-        android:name="com.gflix.app.fragments.home.HomeTvFragment"
+        android:name="com.gflix.app.fragments.tv_shows.TvShowsTvFragment"
         android:label="fragment_tv_shows_tv"
         tools:layout="@layout/fragment_home_tv">
         <action

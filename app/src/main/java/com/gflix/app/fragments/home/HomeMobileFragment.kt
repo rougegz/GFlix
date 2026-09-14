@@ -30,7 +30,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 
-class HomeMobileFragment : Fragment() {
+open class HomeMobileFragment : Fragment() {
 
     private var hasAutoCleared409: Boolean = false
 

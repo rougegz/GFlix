@@ -28,25 +28,27 @@ jobs:
           echo "TMDB_API_KEY=${{ secrets.TMDB_API_KEY }}" >> local.properties
           chmod +x ./gradlew
           mkdir -p /tmp/gflix-apks
+          SAFE_TAG="$(printf '%s' '${{ github.ref_name }}' | tr -c 'A-Za-z0-9._-' '_')"
+          echo "SAFE_TAG=$SAFE_TAG" >> "$GITHUB_ENV"
 
       - name: Build universal APK
         run: ./gradlew assembleRelease --stacktrace
 
       - name: Stage universal APK
         run: |
-          cp "$(ls app/build/outputs/apk/release/*.apk | head -n 1)" "/tmp/gflix-apks/GFlix-${{ github.ref_name }}.apk"
+          cp "$(ls app/build/outputs/apk/release/*.apk | head -n 1)" "/tmp/gflix-apks/GFlix-$SAFE_TAG.apk"
 
       - name: Build mobile APK
         run: |
           echo "APP_LAYOUT=mobile" >> local.properties
           ./gradlew assembleRelease --stacktrace
-          cp "$(ls app/build/outputs/apk/release/*.apk | head -n 1)" "/tmp/gflix-apks/GFlix-${{ github.ref_name }}-only-mobile.apk"
+          cp "$(ls app/build/outputs/apk/release/*.apk | head -n 1)" "/tmp/gflix-apks/GFlix-$SAFE_TAG-only-mobile.apk"
 
       - name: Build TV APK
         run: |
           echo "APP_LAYOUT=tv" >> local.properties
           ./gradlew assembleRelease --stacktrace
-          cp "$(ls app/build/outputs/apk/release/*.apk | head -n 1)" "/tmp/gflix-apks/GFlix-${{ github.ref_name }}-only-tv.apk"
+          cp "$(ls app/build/outputs/apk/release/*.apk | head -n 1)" "/tmp/gflix-apks/GFlix-$SAFE_TAG-only-tv.apk"
           ls -la /tmp/gflix-apks/
 
       - name: Sign APKs
@@ -58,30 +60,39 @@ jobs:
         run: |
           # Unsigned APKs cannot be installed on devices. Prefer the real
           # release keystore when secrets exist, else generate an ephemeral
-          # debug key so sideloaded APKs install.
+          # debug key so sideloaded APKs install (assets get a -debug suffix).
+          umask 077
+          KS="$(mktemp /tmp/gflix-ks.XXXXXXXX)"
+          trap 'rm -f "$KS"' EXIT
           if [ -n "$KEYSTORE_B64" ]; then
-            echo "$KEYSTORE_B64" | base64 -d > /tmp/gflix-release.keystore
-            KS=/tmp/gflix-release.keystore
-            KSP="$SIGNING_STORE_PASSWORD"; KP="$SIGNING_KEY_PASSWORD"; ALIAS="$SIGNING_KEY_ALIAS"
+            printf '%s' "$KEYSTORE_B64" | base64 -d > "$KS"
+            SIGNED_BY=release
+            export KSP="$SIGNING_STORE_PASSWORD" KP="$SIGNING_KEY_PASSWORD"
+            ALIAS="$SIGNING_KEY_ALIAS"
           else
-            KS=/tmp/gflix-debug.keystore
+            echo "::warning::No KEYSTORE secret: signing with an ephemeral debug key"
             keytool -genkeypair -keystore "$KS" -alias androiddebugkey \
               -storepass android -keypass android -keyalg RSA -keysize 2048 \
               -validity 10950 -dname "CN=GFlix Debug" -noprompt
-            KSP=android; KP=android; ALIAS=androiddebugkey
+            SIGNED_BY=debug
+            export KSP=android KP=android
+            ALIAS=androiddebugkey
           fi
           APKSIGNER="$(ls -d "$ANDROID_SDK_ROOT"/build-tools/*/apksigner 2>/dev/null | sort -V | tail -n 1)"
           if [ -z "$APKSIGNER" ]; then
             APKSIGNER="$(find /usr/local/lib/android /opt/android* /android* -name apksigner 2>/dev/null | sort -V | tail -n 1)"
           fi
-          echo "apksigner: $APKSIGNER"
+          echo "apksigner: $APKSIGNER (signed-by=$SIGNED_BY)"
           for apk in /tmp/gflix-apks/*.apk; do
-            "$APKSIGNER" sign --ks "$KS" --ks-pass "pass:$KSP" --key-pass "pass:$KP" \
+            "$APKSIGNER" sign --ks "$KS" --ks-pass env:KSP --key-pass env:KP \
               --ks-key-alias "$ALIAS" --out "${apk%.apk}-signed.apk" "$apk"
             mv "${apk%.apk}-signed.apk" "$apk"
             "$APKSIGNER" verify --print-certs "$apk" | head -n 2
+            if [ "$SIGNED_BY" = "debug" ]; then
+              mv "$apk" "${apk%.apk}-debug.apk"
+            fi
           done
-          rm -f /tmp/gflix-release.keystore
+          echo "SIGNED_BY=$SIGNED_BY" >> "$GITHUB_ENV"
 
       - name: Publish release
         uses: softprops/action-gh-release@v2

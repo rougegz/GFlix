@@ -15,7 +15,6 @@ import androidx.media3.ui.DefaultTrackNameProvider
 import androidx.media3.ui.SubtitleView
 import com.gflix.app.R
 import com.gflix.app.utils.OpenSubtitles
-import com.gflix.app.utils.mediaServers
 import com.gflix.app.utils.SubDL
 import com.gflix.app.utils.SubtitleOffset
 import com.gflix.app.utils.UserPreferences
@@ -353,7 +352,7 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
             player.playbackParameters = player.playbackParameters
                 .withSpeed(speed.value)
             // Remember-My-Choices: carry speed to the next episode/player.
-            com.gflix.app.utils.UserPreferences.playbackSpeed = speed.value
+            UserPreferences.playbackSpeed = speed.value
         }
 
     protected var onExtraBufferingListener: ((Boolean) -> Unit)? = null
@@ -598,8 +597,14 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                         } ?: run {
                             // Preferred max resolution: cap height when no exact
                             // remembered quality matches (0 = unlimited).
+                            // Skipped on explicit user override.
+                            val videoParams = player.trackSelectionParameters
+                            val videoLocked = player.currentTracks.groups.any {
+                                it.type == C.TRACK_TYPE_VIDEO &&
+                                    videoParams.overrides.containsKey(it.mediaTrackGroup)
+                            }
                             val maxHeight = UserPreferences.preferredMaxHeight
-                            if (maxHeight > 0) {
+                            if (maxHeight > 0 && !videoLocked) {
                                 list.filterIsInstance<VideoTrackInformation>()
                                     .filter { it.height in 1..maxHeight }
                                     .maxByOrNull { it.height }
@@ -708,8 +713,17 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
                     )
 
                     // Smart default: prefer the user's audio language (e.g. Telugu).
+                    // Skipped when the user already picked a track (explicit
+                    // override) or audio is disabled (e.g. video-only retry).
+                    val params = player.trackSelectionParameters
+                    val overriddenAudio = player.currentTracks.groups.any {
+                        it.type == C.TRACK_TYPE_AUDIO &&
+                            params.overrides.containsKey(it.mediaTrackGroup)
+                    }
+                    val audioLocked = params.disabledTrackTypes.contains(C.TRACK_TYPE_AUDIO) ||
+                        overriddenAudio
                     val preferredAudio = UserPreferences.preferredAudioLanguage
-                    if (preferredAudio.isNotBlank()) {
+                    if (preferredAudio.isNotBlank() && !audioLocked) {
                         list.find {
                             com.gflix.app.utils.TrackLanguage.matches(
                                 it.name, it.language, preferredAudio
@@ -792,8 +806,16 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
 
                     // Smart default: prefer the user's subtitle language (e.g. Telugu).
                     // Explicit user choice: applies even when server auto-subs are off.
+                    // Skipped on explicit override / disabled text (manual None pick).
+                    val textParams = player.trackSelectionParameters
+                    val overriddenText = player.currentTracks.groups.any {
+                        it.type == C.TRACK_TYPE_TEXT &&
+                            textParams.overrides.containsKey(it.mediaTrackGroup)
+                    }
+                    val subLocked = textParams.disabledTrackTypes.contains(C.TRACK_TYPE_TEXT) ||
+                        overriddenText
                     val preferredSub = UserPreferences.preferredSubtitleLanguage
-                    if (preferredSub.isNotBlank()) {
+                    if (preferredSub.isNotBlank() && !subLocked) {
                         list.filterIsInstance<TextTrackInformation>()
                             .find {
                                 com.gflix.app.utils.TrackLanguage.matches(
@@ -1309,7 +1331,7 @@ abstract class PlayerSettingsView @JvmOverloads constructor(
 
                 val selected: Speed
                     get() = list.find { it.isSelected }
-                        ?: list.find { it.value == com.gflix.app.utils.UserPreferences.playbackSpeed }
+                        ?: list.find { it.value == UserPreferences.playbackSpeed }
                         ?: list.find { it.value == 1F }
                         ?: DEFAULT
 

@@ -1326,15 +1326,18 @@ class PlayerTvFragment : Fragment() {
                             .build()
                         player.prepare()
                         player.play()
-                        Toast.makeText(
-                            requireContext(),
-                            getString(R.string.player_audio_unsupported_video_only),
-                            Toast.LENGTH_LONG
-                        ).show()
+                        context?.let {
+                            Toast.makeText(
+                                it,
+                                getString(R.string.player_audio_unsupported_video_only),
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                         return
                     }
 
-                    val nextServer = servers.getOrNull(servers.indexOf(currentServer) + 1)
+                    val serverIdx = servers.indexOf(currentServer)
+                    val nextServer = if (serverIdx >= 0) servers.getOrNull(serverIdx + 1) else null
                     if (nextServer != null) {
                         Log.i("PlayerTvFragment", "Playback failed, trying next server: ${nextServer.name}")
                         viewModel.getVideo(nextServer)
@@ -1981,7 +1984,7 @@ class PlayerTvFragment : Fragment() {
 
         dataSourceFactory = DefaultDataSource.Factory(requireContext(), httpDataSource)
 
-        player = buildPlayer(extraBuffering).also { player ->
+            player = buildPlayer(extraBuffering).also { player ->
                 player.setAudioAttributes(
                     AudioAttributes.Builder()
                         .setUsage(C.USAGE_MEDIA)
@@ -1989,6 +1992,8 @@ class PlayerTvFragment : Fragment() {
                         .build(),
                     true,
                 )
+                // Bypass rebuild drops player state: restore remembered speed.
+                player.setPlaybackSpeed(UserPreferences.playbackSpeed)
             }
 
         // Bind new player to UI view

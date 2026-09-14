@@ -15,6 +15,7 @@ import com.gflix.app.adapters.viewholders.PeopleViewHolder
 import com.gflix.app.adapters.viewholders.ProviderViewHolder
 import com.gflix.app.adapters.viewholders.SeasonViewHolder
 import com.gflix.app.adapters.viewholders.TvShowViewHolder
+import com.gflix.app.ui.TvFocus
 import com.gflix.app.databinding.ContentCategorySwiperMobileBinding
 import com.gflix.app.databinding.ContentCategorySwiperTvBinding
 import com.gflix.app.databinding.ContentMovieCastMobileBinding
@@ -525,7 +526,7 @@ class AppAdapter(
         }
         // Leanback focus polish for every TV card (attach once, never in bind).
         if (Type.entries[viewType].name.contains("_TV_")) {
-            com.gflix.app.ui.TvFocus.applyScale(holder.itemView)
+            TvFocus.applyScale(holder.itemView)
         }
         return holder
     }

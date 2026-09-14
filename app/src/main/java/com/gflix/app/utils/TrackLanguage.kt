@@ -1,5 +1,7 @@
 package com.gflix.app.utils
 
+import java.util.Locale
+
 /**
  * Smart language matching for default audio/subtitle selection.
  * Matches a user preference like "Telugu" (or "te") against track labels
@@ -46,11 +48,14 @@ object TrackLanguage {
     )
 
     /** Normalize free text to a canonical ISO-639-ish token. */
+    private val BRACKET_RE = Regex("[\\[\\](){}_.\\-+/]+")
+    private val WS_RE = Regex("\\s+")
+
     fun canonical(raw: String?): String {
         if (raw.isNullOrBlank()) return ""
-        val cleaned = raw.lowercase()
-            .replace(Regex("[\\[\\](){}_.\\-+/]+"), " ")
-            .replace(Regex("\\s+"), " ")
+        val cleaned = raw.lowercase(Locale.ROOT)
+            .replace(BRACKET_RE, " ")
+            .replace(WS_RE, " ")
             .trim()
         if (cleaned.isEmpty()) return ""
         CANONICAL[cleaned]?.let { return it }
@@ -73,8 +78,8 @@ object TrackLanguage {
         if (canonical(language) == want) return true
         if (canonical(label) == want) return true
         // Word-boundary fallback for labels like "Telugu (Forced)".
-        val flatLabel = (label ?: "").lowercase()
-        val flatWant = preferred.lowercase().trim()
+        val flatLabel = (label ?: "").lowercase(Locale.ROOT)
+        val flatWant = preferred.lowercase(Locale.ROOT).trim().take(64)
         if (flatWant.length >= 2 &&
             Regex("(?<![a-z])${Regex.escape(flatWant)}(?![a-z])").containsMatchIn(flatLabel)
         ) return true

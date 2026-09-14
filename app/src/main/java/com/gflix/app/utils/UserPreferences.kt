@@ -166,25 +166,25 @@ object UserPreferences {
 
     // Remember-My-Choices: playback speed carries to the next episode/player.
     var playbackSpeed: Float
-        get() = Key.PLAYBACK_SPEED.getFloat() ?: 1F
+        get() = Key.PLAYBACK_SPEED.getFloat()?.takeIf { it.isFinite() }?.coerceIn(0.25F, 2F) ?: 1F
         set(value) {
-            Key.PLAYBACK_SPEED.setFloat(value)
+            Key.PLAYBACK_SPEED.setFloat(value.takeIf { it.isFinite() }?.coerceIn(0.25F, 2F) ?: 1F)
         }
 
     // Smart track defaults: matched against track labels/codes (e.g. "Telugu").
     // Blank = Auto (leave ExoPlayer default selection).
     var preferredAudioLanguage: String
         get() = Key.PREFERRED_AUDIO_LANGUAGE.getString() ?: ""
-        set(value) = Key.PREFERRED_AUDIO_LANGUAGE.setString(value)
+        set(value) = Key.PREFERRED_AUDIO_LANGUAGE.setString(value.trim().take(64))
 
     var preferredSubtitleLanguage: String
         get() = Key.PREFERRED_SUBTITLE_LANGUAGE.getString() ?: ""
-        set(value) = Key.PREFERRED_SUBTITLE_LANGUAGE.setString(value)
+        set(value) = Key.PREFERRED_SUBTITLE_LANGUAGE.setString(value.trim().take(64))
 
     // Preferred max resolution height (0 = unlimited).
     var preferredMaxHeight: Int
-        get() = Key.PREFERRED_MAX_HEIGHT.getInt() ?: 0
-        set(value) = Key.PREFERRED_MAX_HEIGHT.setInt(value)
+        get() = (Key.PREFERRED_MAX_HEIGHT.getInt() ?: 0).coerceAtLeast(0)
+        set(value) = Key.PREFERRED_MAX_HEIGHT.setInt(value.coerceAtLeast(0))
 
     var selectedTheme: String
         get() = Key.SELECTED_THEME.getString() ?: "default"

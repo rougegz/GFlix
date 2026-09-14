@@ -6,9 +6,7 @@ plugins {
 group = "com.gflix.extcore"
 version = "1.0.0"
 
-repositories {
-    mavenCentral()
-}
+// Repositories come from settings.gradle (FAIL_ON_PROJECT_REPOS).
 
 dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0"
